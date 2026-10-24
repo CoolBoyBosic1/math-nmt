@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor U as Учень
+    participant UI as Next.js UI
+    participant API as Route Handlers /api
+    participant PS as PlanService
+    participant DB as PostgreSQL (Prisma)
+
+    U->>UI: Відкриває «Швидкий тест»
+    UI->>API: GET /api/topics
+    API->>DB: topic.findMany()
+    DB-->>API: теми
+    API-->>UI: теми + задачі (по одній з теми)
+    U->>UI: Відповідає на завдання (таймер 60 хв)
+    UI->>API: POST /api/attempts (відповіді)
+    API->>DB: userTask.createMany()
+    UI-->>U: Результат: бал і теми з помилками
+    U->>UI: Вводить години/тиждень і дату НМТ
+    UI->>API: POST /api/plans
+    API->>PS: generate(user, hours, endDate, diagnostics)
+    PS->>DB: помилки за темами (userTask)
+    PS-->>API: план за тижнями
+    API->>DB: plan.create + planTask.createMany
+    API-->>UI: 201 план
+    UI-->>U: Персональний план підготовки

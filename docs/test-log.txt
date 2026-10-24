@@ -1,0 +1,61 @@
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+ RUN  v2.1.9 /home/claude/math-nmt
+
+ ✓ tests/integration/api.test.ts > IT-01..03 POST /api/users — реєстрація > IT-01 коректні дані → 200 і запис у БД
+ ✓ tests/integration/api.test.ts > IT-01..03 POST /api/users — реєстрація > IT-02 email уже зареєстровано (P2002) → 409
+ ✓ tests/integration/api.test.ts > IT-01..03 POST /api/users — реєстрація > IT-03 некоректний email → помилка, у БД нічого не пишеться
+ ✓ tests/integration/api.test.ts > IT-04 PATCH /api/users/[userID] > IT-04 слабкий пароль має відхилятися
+ ✓ tests/integration/api.test.ts > IT-05..07 теми та задачі > IT-05 GET /api/topics → 200 і список тем
+ ✓ tests/integration/api.test.ts > IT-05..07 теми та задачі > IT-06 GET /api/topics/[id] неіснуючої теми → 404
+ ✓ tests/integration/api.test.ts > IT-05..07 теми та задачі > IT-07 POST /api/topics/[id]/tasks без відповіді → 400
+ ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-08 POST /api/plans без userID → помилка
+ ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-09 прогрес плану: статуси red / yellow / green за темами
+ ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-10 прогрес користувача: розв’язані й помилки за темами
+ ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-14 ONE з літерою → singleLetter
+ ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-15 ONE з числом → number
+ ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-16 MATCH → multipleLetters
+ ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-17 невідомий тип → number
+ ✓ tests/unit/test-mode-utils.test.ts > UT-18..23 перевірка відповідей > UT-18 однакова літера — правильна відповідь
+ ✓ tests/unit/test-mode-utils.test.ts > UT-18..23 перевірка відповідей > UT-19 інша літера — неправильна відповідь
+ ✓ tests/unit/test-mode-utils.test.ts > UT-18..23 перевірка відповідей > UT-20 відповідність: усі пари збігаються
+ ✓ tests/unit/test-mode-utils.test.ts > UT-18..23 перевірка відповідей > UT-21 відповідність: одна пара хибна
+ ✓ tests/unit/test-mode-utils.test.ts > UT-18..23 перевірка відповідей > UT-22 число з комою дорівнює числу з крапкою
+ ✓ tests/unit/test-mode-utils.test.ts > UT-18..23 перевірка відповідей > UT-23 нечисловий ввід — неправильна відповідь
+ ✓ tests/unit/test-mode-utils.test.ts > UT-24..26 checkIfTimerNeeded > UT-24 тест минулого року (назва з цифри) — з таймером
+ ✓ tests/unit/test-mode-utils.test.ts > UT-24..26 checkIfTimerNeeded > UT-25 «Швидкий тест» — з таймером
+ ✓ tests/unit/test-mode-utils.test.ts > UT-24..26 checkIfTimerNeeded > UT-26 тема — без таймера
+ ✓ tests/unit/test-mode-utils.test.ts > UT-27..30 час > UT-27 formatTime(125) → 02:05
+ ✓ tests/unit/test-mode-utils.test.ts > UT-27..30 час > UT-28 formatTime(0) → 00:00
+ ✓ tests/unit/test-mode-utils.test.ts > UT-27..30 час > UT-29 calculateCompletionTime(null) → 0
+ ✓ tests/unit/test-mode-utils.test.ts > UT-27..30 час > UT-30 calculateCompletionTime рахує секунди від старту
+ ✓ tests/unit/test-mode-utils.test.ts > UT-31..32 handleTestCompletion > UT-31 з таймером додає час до URL результатів
+ ✓ tests/unit/test-mode-utils.test.ts > UT-31..32 handleTestCompletion > UT-32 без таймера — URL без параметра time
+ ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-11 GET /api/topics повертає 29 тем МОН із seed
+ ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-12 тема «Похідна функції» має теорію і 5 задач із картинками
+ ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-13 НМТ-2024 містить 22 завдання з відповідями всіх трьох типів
+ ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-14 реєстрація зберігає bcrypt-хеш, а не пароль
+ ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-15 повторна реєстрація з тим самим email → 409
+ ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-16 створення плану і порожній прогрес
+ ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-01 приймає латиницю та цифри
+ ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-02 відхиляє кирилицю
+ ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-03 відхиляє нік довший за 20 символів
+ ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-04 приймає нік рівно з 20 символів
+ ✓ tests/unit/validators.test.ts > UT-05..07 isValidEmail > UT-05 приймає коректний email
+ ✓ tests/unit/validators.test.ts > UT-05..07 isValidEmail > UT-06 відхиляє email без @
+ ✓ tests/unit/validators.test.ts > UT-05..07 isValidEmail > UT-07 відхиляє email з пробілом
+ ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-08 приймає пароль з 8 латинських символів і цифр
+ ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-09 відхиляє пароль із 7 символів
+ ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-10 відхиляє пароль із 21 символу
+ ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-11 відхиляє пароль зі спецсимволом
+ ✓ tests/unit/validators.test.ts > UT-12..13 валідатори плану (D1–D2 виправлено) > UT-12 дата НМТ раніше ніж через MIN_DAYS днів — невалідна, через 30 днів — валідна
+ ✓ tests/unit/validators.test.ts > UT-12..13 валідатори плану (D1–D2 виправлено) > UT-13 години на тиждень: 10 — валідно, більше MAX_HOURS або 0 — ні
+ ✓ tests/unit/validators.test.ts > UT-33..35 паролі > UT-33 hashPassword не зберігає пароль відкритим текстом
+ ✓ tests/unit/validators.test.ts > UT-33..35 паролі > UT-34 verifyPassword приймає правильний і відхиляє хибний пароль
+ ✓ tests/unit/validators.test.ts > UT-33..35 паролі > UT-35 withoutPassword прибирає пароль із відповіді
+
+ Test Files  4 passed (4)
+      Tests  51 passed (51)
+   Start at  15:39:47
+   Duration  2.41s (transform 188ms, setup 0ms, collect 396ms, tests 1.10s, environment 1ms, prepare 268ms)
+

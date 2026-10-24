@@ -1,3 +1,40 @@
+# МатНМТ — підготовка до НМТ з математики
+
+Next.js 15 · Prisma 6 (Rust-free клієнт + драйвер `pg`) · PostgreSQL · Vitest
+
+## Швидкий старт
+
+Потрібні Node.js 22 і PostgreSQL 14+.
+
+```bash
+npm install                      # також генерує Prisma Client
+cp .env.example .env             # вкажіть свій DATABASE_URL
+npx prisma migrate deploy        # створює 7 таблиць
+npx prisma db seed               # 29 тем із теорією, 236 задач, демо-користувач
+npm run dev                      # http://localhost:3000
+```
+
+Seed додає задачі з `public/tasks` з правильними відповідями (`prisma/data/answers.json`,
+зчитані з картинок розв’язків скриптом `prisma/data/detect_answers.py`) і демо-користувача
+`demo@matnmt.local` / `demo12345`, від імені якого працюють сторінки плану до появи входу в акаунт.
+
+## Тести
+
+```bash
+npm test                         # модульні та інтеграційні тести (Vitest)
+```
+
+Тести з папки `tests/db` працюють зі справжньою PostgreSQL і запускаються, лише якщо задано `DATABASE_URL`.
+Журнал останнього запуску — `docs/test-log.txt`. У GitHub Actions (`.github/workflows/ci.yml`) на кожен PR
+виконуються міграції, seed, перевірка типів, тести і збірка.
+
+## Документація
+
+- `docs/openapi.yaml`, `docs/api-docs.html` — API (OpenAPI 3.0)
+- `docs/uml/` — діаграми прецедентів, класів, послідовності, розгортання, ER-схема БД
+
+---
+
 # Інструкція як працювати з проектом
 
 ### 1. Клонуйте репозиторій

@@ -1,0 +1,52 @@
+erDiagram
+    USER ||--o{ PLAN : "створює"
+    USER ||--o{ USER_TASK : "розв'язує"
+    TOPIC ||--o{ TASK : "містить"
+    TOPIC ||--o| THEORY : "має"
+    TOPIC |o--o{ PLAN : "фокус плану"
+    TASK ||--o{ USER_TASK : "спроби"
+    TASK ||--o{ PLAN_TASK : "входить у"
+    PLAN ||--o{ PLAN_TASK : "складається з"
+
+    USER {
+        uuid id PK
+        string firstName "nullable"
+        string nickname
+        string email UK
+        string password
+    }
+    TOPIC {
+        uuid id PK
+        uuid parentID "дерево тем МОН"
+        string title
+    }
+    THEORY {
+        uuid topicID PK,FK
+        string content
+    }
+    TASK {
+        uuid id PK
+        uuid topicID FK
+        string description
+        string problem "шлях до зображення"
+        string solution "шлях до зображення"
+        AnswerType type "ONE | MATCH | TYPE"
+        string answer
+    }
+    USER_TASK {
+        uuid userID PK,FK
+        uuid taskID PK,FK
+        datetime passed_on "null = помилка"
+    }
+    PLAN {
+        uuid id PK
+        uuid userID FK
+        int hours "годин на тиждень"
+        datetime startDate
+        datetime endDate
+        uuid topicId FK "nullable"
+    }
+    PLAN_TASK {
+        uuid planID PK,FK
+        uuid taskID PK,FK
+    }
