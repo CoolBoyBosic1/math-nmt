@@ -1,6 +1,8 @@
+// Rust-free клієнт (engineType = "client"): працює через драйвер pg без query engine
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["relationJoins"]
+  engineType      = "client"
+  previewFeatures = ["relationJoins", "queryCompiler", "driverAdapters"]
 }
 
 datasource db {
