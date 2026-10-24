@@ -5,11 +5,11 @@ import { prisma } from "@/lib/db";
 
 export async function GET(
   request: Request,
-  { params }: { params: { userID: string } }
+  { params }: { params: Promise<{ userID: string }> }
 ) {
   try {
     // Отримуємо userID з параметрів URL (без await)
-    const userId = params.userID;
+    const { userID: userId } = await params;
 
     // Запит до бази даних для пошуку користувача та отримання останнього плану
     const user = await prisma.user.findUnique({

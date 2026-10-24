@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { DEMO_USER_ID } from "@/lib/demo";
 
 /* ієрархічна структура тем */
 const rawTopics = [
@@ -136,7 +137,7 @@ function flattenLeafTopics(topics: any[], parent: string | null = null) {
 /* ===== Функція getReviewTopics =====
    Повертає список великих тем рев’ю із rawTopics, що містяться в reviewTopicNames ===== */
 function getReviewTopics(rawTopics: any[]) {
-  let reviews: any[] = [];
+  const reviews: any[] = [];
   rawTopics.forEach((item) => {
     if (reviewTopicNames.includes(item.name)) {
       reviews.push({
@@ -291,7 +292,7 @@ export default function StudyPlanPage() {
   const [error, setError] = useState<string | null>(null);
   const [theoryCompleted, setTheoryCompleted] = useState<{ [id: string]: boolean }>({});
 
-  const userId = "7b9f3bd3-1429-4764-b718-c2c472a77518";
+  const userId = DEMO_USER_ID; // TODO (Sprint 5): брати ID із сесії
 
   useEffect(() => {
     async function fetchData() {

@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export async function DELETE(request: Request, context: { params: { planID: string, topicID: string, taskID: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ planID: string, topicID: string, taskID: string }> }) {
     try {
         const { params } = context;
-        const planID = await params.planID;
-        const taskID = await params.taskID;
+        const { planID, taskID } = await params;
 
         const deletedPlanTask = await prisma.planTask.delete({
             where: {

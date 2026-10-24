@@ -4,11 +4,11 @@ import { prisma } from "@/lib/db";
 
 export async function GET(
   request: Request,
-  context: { params: { userID: string } }
+  context: { params: Promise<{ userID: string }> }
 ) {
   try {
     const { params } = await context;
-    const userID = params.userID;
+    const { userID } = await params;
 
     // Отримуємо всі записи UserTask для даного користувача
     // Припустимо, що якщо passed_on не null – завдання виконано правильно,

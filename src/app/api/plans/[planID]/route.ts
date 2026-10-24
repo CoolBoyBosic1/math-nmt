@@ -1,9 +1,9 @@
 import { Plan } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server"
-import { isValidEndDate, isValidHours, MIN_DAYS, MIN_HOURS } from "@/lib/validator/plan";
+import { isValidEndDate, isValidHours, END_DATE_ERROR, HOURS_ERROR } from "@/lib/validator/plan";
 
-export async function GET(request: Request, contex: { params: { planID: string } }) {
+export async function GET(request: Request, contex: { params: Promise<{ planID: string }> }) {
   try {
     const { params } = await contex;
     const { planID } = await params;
@@ -22,7 +22,7 @@ export async function GET(request: Request, contex: { params: { planID: string }
   }
 };
 
-export async function PUT(request: Request, contex: { params: { planID: string } }) {
+export async function PUT(request: Request, contex: { params: Promise<{ planID: string }> }) {
   try {
     const { params } = await contex;
     const { planID } = await params;
@@ -33,8 +33,8 @@ export async function PUT(request: Request, contex: { params: { planID: string }
     if (!body.endDate) throw new Error("Require endDate");
 
 
-    if (!isValidEndDate(body.endDate)) throw new Error(`Invalid end date. Minimum days require ${MIN_DAYS}`);
-    if (!isValidHours(body.hours)) throw new Error(`Invalid amount of hours. Minimum is ${MIN_HOURS}`);
+    if (!isValidEndDate(body.endDate)) throw new Error(END_DATE_ERROR);
+    if (!isValidHours(body.hours)) throw new Error(HOURS_ERROR);
 
     const plan: Plan = body;
 
@@ -51,15 +51,15 @@ export async function PUT(request: Request, contex: { params: { planID: string }
   }
 }
 
-export async function PATCH(request: Request, contex: { params: { planID: string } }) {
+export async function PATCH(request: Request, contex: { params: Promise<{ planID: string }> }) {
   try {
     const { params } = await contex;
     const { planID } = await params;
 
     const body = await request.json();
 
-    if (!isValidEndDate(body.endDate)) throw new Error(`Invalid end date. Minimum days require ${MIN_DAYS}`);
-    if (!isValidHours(body.hours)) throw new Error(`Invalid amount of hours. Minimum is ${MIN_HOURS}`);
+    if (body.endDate !== undefined && !isValidEndDate(body.endDate)) throw new Error(END_DATE_ERROR);
+    if (body.hours !== undefined && !isValidHours(body.hours)) throw new Error(HOURS_ERROR);
 
     const plan: Plan = body;
 
@@ -76,7 +76,7 @@ export async function PATCH(request: Request, contex: { params: { planID: string
   }
 }
 
-export async function DELETE(request: Request, contex: { params: { planID: string } }) {
+export async function DELETE(request: Request, contex: { params: Promise<{ planID: string }> }) {
   try {
     const { params } = await contex;
     const { planID } = await params;
@@ -91,4 +91,4 @@ export async function DELETE(request: Request, contex: { params: { planID: strin
   catch (error) {
     return NextResponse.json({ error: `PlanID error: ${error.message}` }, { status: 503 });
   }
-};
+};

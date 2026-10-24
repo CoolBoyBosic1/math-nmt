@@ -47,7 +47,7 @@ export default function TestModePage() {
     }
     async function fetchTasks() {
       try {
-        const res = await fetch(`http://localhost:3000/api/topics/${topicId}`, { cache: "no-store" });
+        const res = await fetch(`/api/topics/${topicId}`, { cache: "no-store" });
         if (!res.ok) throw new Error(`Статус: ${res.status}`);
         
         const data = await res.json();

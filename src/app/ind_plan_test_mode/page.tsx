@@ -4,12 +4,9 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 export default function TestModePage() {
-  // Оскільки файл знаходиться за шляхом app/test-mode/[topicId]/page.tsx,
-  // використовуйте useParams для отримання topicId.
   const { topicId } = useParams();
-  const router = useRouter();
 
-  // Якщо topicId відсутній, виводимо повідомлення
+  // Якщо topicId відсутній, виводимо повідомлення (до виклику інших хуків)
   if (!topicId) {
     return (
       <p>
@@ -17,6 +14,12 @@ export default function TestModePage() {
       </p>
     );
   }
+
+  return <TestModeContent topicId={String(topicId)} />;
+}
+
+function TestModeContent({ topicId }: { topicId: string }) {
+  const router = useRouter();
 
   // Локальний стан компонента
   const [tasks, setTasks] = useState<any[]>([]);

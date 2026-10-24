@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { Task } from "@prisma/client";
 
-export async function GET(req: Request, context: { params: { topicID: string, taskID: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ topicID: string, taskID: string }> }) {
     try {
         const { params } = await context;
         const { topicID, taskID } = await params;
@@ -20,7 +20,7 @@ export async function GET(req: Request, context: { params: { topicID: string, ta
     }
 }
 
-export async function PUT(request: Request, context: { params: { topicID: string, taskID: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ topicID: string, taskID: string }> }) {
     try {
         const { params } = context;
         const { topicID, taskID } = await params;
@@ -50,7 +50,7 @@ export async function PUT(request: Request, context: { params: { topicID: string
     }
 }
 
-export async function PATCH(request: Request, context: { params: { topicID: string, taskID: string } }) {
+export async function PATCH(request: Request, context: { params: Promise<{ topicID: string, taskID: string }> }) {
     try {
         const { params } = context;
         const { topicID, taskID } = await params;
@@ -74,10 +74,10 @@ export async function PATCH(request: Request, context: { params: { topicID: stri
     }
 }
 
-export async function DELETE(request: Request, context: { params: { topicID: string, taskID: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ topicID: string, taskID: string }> }) {
     try {
         const { params } = context;
-        const { topicID, taskID } = params;
+        const { topicID, taskID } = await params;
 
         const deletedTask = await prisma.task.delete({
             where: {
