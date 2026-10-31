@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { isValidNickname, isValidEmail, isValidPassword } from "@/lib/validator/user";
 import { prisma } from "@/lib/db";
 import { User } from "@prisma/client";
-//import bcrypt from "bcrypt";
+import { hashPassword, publicUserSelect } from "@/lib/users";
 
 export async function GET() {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({ select: publicUserSelect });
     return NextResponse.json(users, { status: 200 });
   }
   catch (error) {
@@ -26,11 +26,9 @@ export async function POST(request: Request) {
     if (!isValidEmail(body.email)) throw new Error("Invalid email");
     if (!isValidPassword(body.password)) throw new Error("The password must include: A-Z,a-z,0-9 and must have a length 8-20 symbols");
 
-    //const hashedPassword = await bcrypt.hash(password, 10);
+    const user: User = { ...body, password: await hashPassword(body.password) };
 
-    const user: User = body;
-
-    const newUser = await prisma.user.create({ data: user });
+    const newUser = await prisma.user.create({ data: user, select: publicUserSelect });
 
 
     return NextResponse.json(newUser, { status: 200 });

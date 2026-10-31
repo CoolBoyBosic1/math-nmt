@@ -1,7 +1,7 @@
 "use client";
 
 import Confetti from "react-confetti";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import useUnsavedChangesWarning from "./routerWarning";
@@ -13,7 +13,7 @@ import { ControlButtons } from "../ui/test_mode/controlButtons";
 import { PageHeader } from "../ui/test_mode/pageHeader";
 import './style.css';
 
-export default function TestModePage() {
+function TestModePageContent() {
   const router = useRouter();
 
   const [sampledTasks, setSampledTasks] = useState<SampledTask[]>([]);
@@ -36,7 +36,7 @@ export default function TestModePage() {
     async function fetchTopicsAndSampleTasks() {
       try {
         // отримуємо всі теми
-        const topicsRes = await fetch(`http://localhost:3000/api/topics`, { cache: "no-store" });
+        const topicsRes = await fetch(`/api/topics`, { cache: "no-store" });
         if (!topicsRes.ok) throw new Error(`Статус: ${topicsRes.status}`);
         const allTopics = await topicsRes.json();
         
@@ -52,7 +52,7 @@ export default function TestModePage() {
         for (const topic of filteredTopics) {
           try {
             // Завантажуємо деталі теми з завданнями
-            const taskRes = await fetch(`http://localhost:3000/api/topics/${topic.id}`, { cache: "no-store" });
+            const taskRes = await fetch(`/api/topics/${topic.id}`, { cache: "no-store" });
             if (!taskRes.ok) continue;
             
             const topicData = await taskRes.json();
@@ -308,5 +308,14 @@ export default function TestModePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// useSearchParams потребує Suspense для збірки Next.js 15
+export default function TestModePage() {
+  return (
+    <Suspense fallback={<p className="text-center mt-5">Завантаження...</p>}>
+      <TestModePageContent />
+    </Suspense>
   );
 }

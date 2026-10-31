@@ -155,7 +155,7 @@ const ProfilePage: React.FC = () => {
         <div className="col-md-4 d-flex flex-column gap-4">
           <NavigationCard icon={User} title="Профіль користувача" description="Редагуйте свій профіль" href="/edit_profile" />
           <NavigationCard icon={AlertTriangle} title="Мої помилки" description="Вирішите задачі, у яких ви зробили помилки" href="/my_mistakes" />
-          <NavigationCard icon={BookOpen} title="Мій навчальний план" description="Персоналізований план навчання для вас" href="/study_plan" />
+          <NavigationCard icon={BookOpen} title="Мій навчальний план" description="Персоналізований план навчання для вас" href="/personal_program_registered" />
         </div>
         <div className="col-md-8">
           <h3 className="fw-bold text-dark mt-3 mb-4">Прогрес за темами</h3>

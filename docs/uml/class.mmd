@@ -1,0 +1,70 @@
+classDiagram
+    direction LR
+    class User {
+        +UUID id
+        +String nickname
+        +String email
+        -String passwordHash
+        +register()
+        +updateProfile()
+    }
+    class Plan {
+        +UUID id
+        +int hoursPerWeek
+        +Date startDate
+        +Date endDate
+        +progress() TopicProgress[]
+    }
+    class Topic {
+        +UUID id
+        +UUID parentID
+        +String title
+    }
+    class Theory {
+        +String content
+    }
+    class Task {
+        +UUID id
+        +String problem
+        +String solution
+        +AnswerType type
+        +String answer
+        +check(answer) bool
+    }
+    class UserTask {
+        +Date passedOn
+        +isError() bool
+    }
+    class TestSession {
+        +String mode
+        +int timeLimitSec
+        +start()
+        +finish() TestResult
+    }
+    class PlanService {
+        +generate(user, hours, endDate, diagnostics) Plan
+        +recalculate(plan)
+    }
+    class RecommendationService {
+        +nextTasks(user, n) Task[]
+    }
+    class AnswerType {
+        <<enumeration>>
+        ONE
+        MATCH
+        TYPE
+    }
+    User "1" --> "*" Plan
+    User "1" --> "*" UserTask
+    Plan "*" --> "*" Task : PlanTask
+    Topic "1" --> "*" Task
+    Topic "1" --> "0..1" Theory
+    Topic "1" --> "*" Topic : підтеми
+    Task "1" --> "*" UserTask
+    Task --> AnswerType
+    TestSession --> "*" Task
+    TestSession ..> UserTask : зберігає відповіді
+    PlanService ..> Plan
+    PlanService ..> UserTask : враховує помилки
+    RecommendationService ..> UserTask
+    RecommendationService ..> Task

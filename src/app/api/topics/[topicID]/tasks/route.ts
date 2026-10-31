@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Task } from "@prisma/client";
 
-export async function GET(request: Request, context: { params: { topicID: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ topicID: string }> }) {
     try {
         const { params } = await context;
         const { topicID } = await params;

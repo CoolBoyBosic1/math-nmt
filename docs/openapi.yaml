@@ -1,0 +1,427 @@
+openapi: 3.0.3
+info:
+  title: МатНМТ API
+  version: 0.1.0
+  description: |
+    REST API платформи підготовки до НМТ з математики (Next.js Route Handlers + Prisma + PostgreSQL).
+    Документацію складено за кодом у src/app/api станом на 24.10.2026.
+    Паролі зберігаються як bcrypt-хеш і ніколи не повертаються у відповідях.
+    Відомі обмеження поточної версії: немає автентифікації (усі маршрути відкриті, Sprint 4),
+    помилки валідації часто повертають 500/503 замість 400 (Sprint 4).
+servers:
+  - url: http://localhost:3000
+    description: Локальний запуск (npm run dev)
+tags:
+  - name: Users
+  - name: Topics
+  - name: Tasks
+  - name: Plans
+  - name: Progress
+
+paths:
+  /api/users:
+    get:
+      tags: [Users]
+      summary: Список користувачів
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/User" } } } } }
+        "500": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [Users]
+      summary: Реєстрація користувача
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: "#/components/schemas/UserCreate" } } }
+      responses:
+        "200": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "409": { description: Email уже зареєстровано, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "500": { description: Помилка валідації або БД, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+
+  /api/users/{userID}:
+    parameters: [{ $ref: "#/components/parameters/userID" }]
+    get:
+      tags: [Users]
+      summary: Користувач за ID
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "500": { $ref: "#/components/responses/Error" }
+    put:
+      tags: [Users]
+      summary: Повне оновлення профілю (firstName, nickname, email, password обов’язкові)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UserUpdate" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "500": { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Users]
+      summary: Часткове оновлення профілю
+      description: "Новий пароль (якщо передано) валідується і хешується; D3 виправлено (тест IT-04)."
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UserUpdate" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "500": { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [Users]
+      summary: Видалення користувача
+      responses:
+        "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "500": { $ref: "#/components/responses/Error" }
+
+  /api/users/{userID}/plan:
+    parameters: [{ $ref: "#/components/parameters/userID" }]
+    get:
+      tags: [Users, Plans]
+      summary: Користувач і його останній (активний) план
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { type: object, properties: { id: { type: string, format: uuid }, nickname: { type: string }, email: { type: string } } }
+                  plan: { type: object, nullable: true, allOf: [{ $ref: "#/components/schemas/Plan" }] }
+                  currentDate: { type: string, format: date-time }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+
+  /api/users/{userID}/topics/{topicID}/tasks:
+    parameters: [{ $ref: "#/components/parameters/userID" }, { $ref: "#/components/parameters/topicID" }]
+    get:
+      tags: [Users, Tasks]
+      summary: Задачі теми зі статусом розв’язання користувачем
+      description: "Повертає задачі теми з історією розв’язання вказаного користувача."
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Task" } } } } }
+
+  /api/topics:
+    get:
+      tags: [Topics]
+      summary: Усі теми (дерево через parentID)
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Topic" } } } } }
+        "503": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [Topics]
+      summary: Створити тему
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TopicInput" } } } }
+      responses:
+        "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Topic" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+
+  /api/topics/{topicID}:
+    parameters: [{ $ref: "#/components/parameters/topicID" }]
+    get:
+      tags: [Topics]
+      summary: Тема з задачами, теорією та планами
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/TopicDetails" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    put:
+      tags: [Topics]
+      summary: Повне оновлення теми
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TopicInput" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Topic" } } } }
+        "501": { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Topics]
+      summary: Часткове оновлення теми
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TopicInput" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Topic" } } } }
+        "501": { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [Topics]
+      summary: Видалити тему
+      responses:
+        "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/Topic" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+
+  /api/topics/{topicID}/tasks:
+    parameters: [{ $ref: "#/components/parameters/topicID" }]
+    get:
+      tags: [Tasks]
+      summary: Задачі теми
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Task" } } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [Tasks]
+      summary: Створити задачу (topicID передається в тілі)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TaskInput" } } } }
+      responses:
+        "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Task" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+
+  /api/topics/{topicID}/tasks/{taskID}:
+    parameters: [{ $ref: "#/components/parameters/topicID" }, { $ref: "#/components/parameters/taskID" }]
+    get:
+      tags: [Tasks]
+      summary: Задача за ID
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Task" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    put:
+      tags: [Tasks]
+      summary: Повне оновлення задачі
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TaskInput" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Task" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Tasks]
+      summary: Часткове оновлення задачі
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/TaskInput" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Task" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [Tasks]
+      summary: Видалити задачу
+      responses:
+        "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/Task" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /api/plans:
+    get:
+      tags: [Plans]
+      summary: Усі плани
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Plan" } } } } }
+        "503": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [Plans]
+      summary: Створити план навчання
+      description: "Правила: дата НМТ — щонайменше через 7 днів; годин на тиждень — від 1 до 80 (UT-12, UT-13)."
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
+      responses:
+        "200": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+
+  /api/plans/update:
+    put:
+      tags: [Plans]
+      summary: Додати задачі до плану (upsert PlanTask)
+      description: "Дефект: значення topicID записується як taskID."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planID, progressUpdates]
+              properties:
+                userID: { type: string, format: uuid }
+                planID: { type: string, format: uuid }
+                progressUpdates: { type: array, items: { type: object, properties: { topicID: { type: string, format: uuid } } } }
+      responses:
+        "200": { description: План оновлено }
+        "500": { $ref: "#/components/responses/Error" }
+
+  /api/plans/{planID}:
+    parameters: [{ $ref: "#/components/parameters/planID" }]
+    get:
+      tags: [Plans]
+      summary: План за ID
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+    put:
+      tags: [Plans]
+      summary: Повне оновлення плану (hours, endDate обов’язкові)
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [Plans]
+      summary: Часткове оновлення плану
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+    delete:
+      tags: [Plans]
+      summary: Видалити план
+      responses:
+        "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+
+  /api/plans/{planID}/topics:
+    parameters: [{ $ref: "#/components/parameters/planID" }]
+    get:
+      tags: [Plans]
+      summary: Повертає userID власника плану (тимчасова реалізація)
+      responses:
+        "200": { description: userID, content: { application/json: { schema: { type: string, format: uuid } } } }
+        "500": { $ref: "#/components/responses/Error" }
+
+  /api/plans/{planID}/topics/{topicID}/tasks:
+    parameters: [{ $ref: "#/components/parameters/planID" }, { $ref: "#/components/parameters/topicID" }]
+    get:
+      tags: [Plans, Tasks]
+      summary: Задачі теми, що входять до плану, зі статусом користувача
+      responses:
+        "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Task" } } } } }
+        "503": { $ref: "#/components/responses/Error" }
+    post:
+      tags: [Plans, Tasks]
+      summary: Додати задачу до плану
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [taskID], properties: { taskID: { type: string, format: uuid } } } } }
+      responses:
+        "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/PlanTask" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+
+  /api/plans/{planID}/topics/{topicID}/tasks/{taskID}:
+    parameters: [{ $ref: "#/components/parameters/planID" }, { $ref: "#/components/parameters/topicID" }, { $ref: "#/components/parameters/taskID" }]
+    delete:
+      tags: [Plans, Tasks]
+      summary: Прибрати задачу з плану
+      responses:
+        "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/PlanTask" } } } }
+        "503": { $ref: "#/components/responses/Error" }
+
+  /api/plans/{planID}/progress:
+    parameters: [{ $ref: "#/components/parameters/planID" }]
+    get:
+      tags: [Plans, Progress]
+      summary: Прогрес плану за темами (red — 0%, yellow — частково, green — 100%)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan: { $ref: "#/components/schemas/Plan" }
+                  topicProgress: { type: array, items: { $ref: "#/components/schemas/TopicProgress" } }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+
+  /api/progress/{userID}:
+    parameters: [{ $ref: "#/components/parameters/userID" }]
+    get:
+      tags: [Progress]
+      summary: Розв’язані задачі та помилки користувача за темами
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  progress:
+                    type: object
+                    additionalProperties: { type: object, properties: { solved: { type: integer }, errors: { type: integer } } }
+        "500": { $ref: "#/components/responses/Error" }
+
+components:
+  parameters:
+    userID: { name: userID, in: path, required: true, schema: { type: string, format: uuid } }
+    topicID: { name: topicID, in: path, required: true, schema: { type: string, format: uuid } }
+    taskID: { name: taskID, in: path, required: true, schema: { type: string, format: uuid } }
+    planID: { name: planID, in: path, required: true, schema: { type: string, format: uuid } }
+  responses:
+    Error:
+      description: Помилка
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+  schemas:
+    Error:
+      type: object
+      properties: { error: { type: string } }
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        firstName: { type: string, nullable: true }
+        nickname: { type: string, maxLength: 20, pattern: "^[A-Za-z0-9]+$" }
+        email: { type: string, format: email }
+    UserCreate:
+      type: object
+      required: [nickname, email, password]
+      properties:
+        firstName: { type: string }
+        nickname: { type: string, maxLength: 20, pattern: "^[A-Za-z0-9]+$" }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 20, pattern: "^[A-Za-z0-9]+$" }
+    UserUpdate:
+      allOf: [{ $ref: "#/components/schemas/UserCreate" }]
+    Topic:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        parentID: { type: string, format: uuid, description: "Батьківська тема (дерево тем МОН)" }
+        title: { type: string }
+    TopicInput:
+      type: object
+      required: [parentID, title]
+      properties:
+        parentID: { type: string, format: uuid }
+        title: { type: string }
+    TopicDetails:
+      allOf:
+        - $ref: "#/components/schemas/Topic"
+        - type: object
+          properties:
+            Task: { type: array, items: { $ref: "#/components/schemas/Task" } }
+            Plan: { type: array, items: { $ref: "#/components/schemas/Plan" } }
+            Theory: { nullable: true, type: object, properties: { topicID: { type: string, format: uuid }, content: { type: string } } }
+    Task:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        topicID: { type: string, format: uuid }
+        description: { type: string }
+        problem: { type: string, description: "Шлях до зображення умови" }
+        solution: { type: string, description: "Шлях до зображення розв’язку" }
+        type: { $ref: "#/components/schemas/AnswerType" }
+        answer: { type: string }
+    TaskInput:
+      type: object
+      required: [topicID, description, problem, solution, type, answer]
+      properties:
+        topicID: { type: string, format: uuid }
+        description: { type: string }
+        problem: { type: string }
+        solution: { type: string }
+        type: { $ref: "#/components/schemas/AnswerType" }
+        answer: { type: string }
+    AnswerType:
+      type: string
+      enum: [ONE, MATCH, TYPE]
+      description: "ONE — одна відповідь (літера або число), MATCH — відповідність, TYPE — відкрита відповідь"
+    Plan:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        userID: { type: string, format: uuid }
+        hours: { type: integer, nullable: true }
+        startDate: { type: string, format: date-time }
+        endDate: { type: string, format: date-time, nullable: true }
+        topicId: { type: string, format: uuid, nullable: true }
+    PlanInput:
+      type: object
+      required: [userID]
+      properties:
+        userID: { type: string, format: uuid }
+        hours: { type: integer }
+        endDate: { type: string, format: date-time }
+    PlanTask:
+      type: object
+      properties:
+        planID: { type: string, format: uuid }
+        taskID: { type: string, format: uuid }
+    TopicProgress:
+      type: object
+      properties:
+        topicID: { type: string, format: uuid }
+        totalInPlan: { type: integer }
+        solved: { type: integer }
+        status: { type: string, enum: [red, yellow, green] }
+        ratio: { type: number }

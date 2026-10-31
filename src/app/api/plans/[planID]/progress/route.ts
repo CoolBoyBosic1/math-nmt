@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { planID: string } }
+  { params }: { params: Promise<{ planID: string }> }
 ) {
   try {
     // 1. Отримуємо planID з параметрів маршруту
-    const { planID } = params;
+    const { planID } = await params;
 
     // 2. Знаходимо навчальний план із зв'язком PlanTask та інформацією про користувача
     const plan = await prisma.plan.findUnique({

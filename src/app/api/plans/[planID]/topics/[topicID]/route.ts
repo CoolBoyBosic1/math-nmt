@@ -1,4 +1,4 @@
-// export async function GET(request: Request, context: { params: { planID: string, topicID: string } }) {
+// export async function GET(request: Request, context: { params: Promise<{ planID: string, topicID: string }> }) {
 //     try {
 //         const { params } = context;
 //         const id = params.topicID;
@@ -52,3 +52,4 @@
 //         return NextResponse.json({ error: `TopicID error: ${error.message}` }, { status: 503 });
 //     }
 // }
+export {};

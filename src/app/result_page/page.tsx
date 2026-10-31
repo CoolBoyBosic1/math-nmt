@@ -1,10 +1,12 @@
 "use client";
+
+import { Suspense } from "react";
  
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
  
-export default function ResultsPage() {
+function ResultsPageContent() {
   const searchParams = useSearchParams();
   
   const [title, setTitle] = useState("");
@@ -55,7 +57,7 @@ export default function ResultsPage() {
     // topic
     const fetchTopicTitle = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/topics/${topicId}`, { cache: "no-store" });
+        const res = await fetch(`/api/topics/${topicId}`, { cache: "no-store" });
         if (!res.ok) throw new Error(`Статус: ${res.status}`);
         
         const data = await res.json();
@@ -144,5 +146,14 @@ export default function ResultsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// useSearchParams потребує Suspense для збірки Next.js 15
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<p className="text-center mt-5">Завантаження...</p>}>
+      <ResultsPageContent />
+    </Suspense>
   );
 }

@@ -4,6 +4,8 @@ import { useState } from "react";
 import "../styles/styles.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { DEMO_USER_ID } from "@/lib/demo";
+import { MIN_HOURS, MAX_HOURS, MIN_DAYS } from "@/lib/validator/plan";
 
 export default function PersonalPlanPage() {
   const router = useRouter();
@@ -16,7 +18,7 @@ export default function PersonalPlanPage() {
 
   const validateHours = (hours: number) => {
     if (isNaN(hours)) return "Введіть коректну кількість годин";
-    if (hours < 0 || hours > 168) return "Число має бути від 0 до 168";
+    if (hours < MIN_HOURS || hours > MAX_HOURS) return `Число має бути від ${MIN_HOURS} до ${MAX_HOURS}`;
     return null;
   };
 
@@ -34,7 +36,9 @@ export default function PersonalPlanPage() {
     if (hoursError) return setError(hoursError);
     
     if (!endDate) return setError("Оберіть дату завершення");
-    if (new Date(endDate) < new Date()) return setError("Дата має бути у майбутньому");
+    const earliest = new Date();
+    earliest.setDate(earliest.getDate() + MIN_DAYS);
+    if (new Date(endDate) < earliest) return setError(`Дата має бути щонайменше через ${MIN_DAYS} днів`);
 
     setIsLoading(true);
     setError(null);
@@ -46,7 +50,7 @@ export default function PersonalPlanPage() {
         body: JSON.stringify({
           hours: Number(hoursNumber),
           endDate: new Date(endDate).toISOString(),
-          userID: "temp-user-id" // TODO: Замінити на реальний ID з авторизації
+          userID: DEMO_USER_ID // TODO (Sprint 5): брати ID із сесії
         })
       });
 
@@ -55,7 +59,7 @@ export default function PersonalPlanPage() {
         throw new Error(data.error || "Помилка при створенні плану");
       }
 
-      router.push("/personal/dashboard");
+      router.push("/personal_program_registered");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Невідома помилка");
     } finally {
@@ -131,8 +135,8 @@ export default function PersonalPlanPage() {
                 }}
                 className="form-control mx-auto"
                 style={{ width: "300px", fontSize: "1rem", textAlign: "center" }}
-                min="0"
-                max="168"
+                min={MIN_HOURS}
+                max={MAX_HOURS}
               />
             </div>
 

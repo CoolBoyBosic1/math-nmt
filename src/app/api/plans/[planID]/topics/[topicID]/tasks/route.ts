@@ -2,7 +2,7 @@ import { PlanTask } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, context: { params: { planID: string, topicID: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ planID: string, topicID: string }> }) {
     try {
         const { params } = await context;
         const { planID, topicID } = await params;
@@ -47,10 +47,10 @@ export async function GET(request: Request, context: { params: { planID: string,
     }
 }
 
-export async function POST(request: Request, context: { params: { planID: string, topicID: string } }) {
+export async function POST(request: Request, context: { params: Promise<{ planID: string, topicID: string }> }) {
     try {
         const { params } = await context;
-        const planID = await params.planID;
+        const { planID } = await params;
 
         const body = await request.json();
         const planTask: PlanTask = body;

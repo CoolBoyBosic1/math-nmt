@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph client["Браузер учня"]
+        ui["React-сторінки<br/>(App Router, Bootstrap)"]
+    end
+    subgraph vercel["Vercel"]
+        rh["Route Handlers /api<br/>валідація · Auth.js"]
+        svc["Сервіси<br/>PlanService · Recommendation"]
+        orm["Prisma Client"]
+        static["Статика: зображення<br/>задач і розв’язків"]
+    end
+    subgraph data["Керована PostgreSQL"]
+        db[("БД МатНМТ")]
+    end
+    subgraph ci["GitHub"]
+        repo["Репозиторій"] --> gha["Actions:<br/>lint · Vitest · build"]
+    end
+    ui -- "HTTPS JSON" --> rh
+    ui -- "HTTPS" --> static
+    rh --> svc --> orm -- "TCP/SSL" --> db
+    gha -- "деплой" --> vercel

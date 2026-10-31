@@ -2,7 +2,7 @@ import { Topic } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, context: { params: { topicID: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ topicID: string }> }) {
     try {
         const { params } = await context;
         const { topicID } = await params;
@@ -27,7 +27,7 @@ export async function GET(request: Request, context: { params: { topicID: string
 
 // export async function GET(
 //     request: Request,
-//     { params }: { params: { topicId: string } }
+//     { params }: { params: Promise<{ topicId: string }> }
 //   ) {
 //     try {
 //       const { topicId } = params;
@@ -48,7 +48,7 @@ export async function GET(request: Request, context: { params: { topicID: string
 //     }
 //   }
 
-export async function PUT(request: Request, context: { params: { topicID: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ topicID: string }> }) {
     try {
         const { params } = await context;
         const { topicID } = await params;
@@ -74,7 +74,7 @@ export async function PUT(request: Request, context: { params: { topicID: string
     }
 }
 
-export async function PATCH(request: Request, context: { params: { topicID: string } }) {
+export async function PATCH(request: Request, context: { params: Promise<{ topicID: string }> }) {
     try {
         const { params } = await context;
         const { topicID } = await params;
@@ -97,10 +97,10 @@ export async function PATCH(request: Request, context: { params: { topicID: stri
     }
 }
 
-export async function DELETE(request: Request, context: { params: { topicID: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ topicID: string }> }) {
     try {
         const { params } = context;
-        const { topicID } = params;
+        const { topicID } = await params;
 
         const deletedTopic = await prisma.topic.delete({
             where: {

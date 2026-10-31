@@ -1,0 +1,946 @@
+{
+ "previousNMT/2022.1.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.10.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.11.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.12.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.13.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.14.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.15.png": {
+  "answer": "{\"1\": \"Б\", \"2\": \"А\", \"3\": \"Д\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2022.1.16.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"Б\", \"3\": \"В\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2022.1.17.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"Б\", \"3\": \"В\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2022.1.18.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"Д\", \"3\": \"А\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2022.1.19.png": {
+  "answer": "3.75",
+  "type": "TYPE"
+ },
+ "previousNMT/2022.1.2.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.20.png": {
+  "answer": "8",
+  "type": "TYPE"
+ },
+ "previousNMT/2022.1.3.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.4.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.5.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.6.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.7.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.8.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2022.1.9.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.10.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.11.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.12.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.13.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.14.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.15.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.16.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"А\", \"3\": \"Г\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2023.1.17.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"А\", \"3\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2023.1.18.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"В\", \"3\": \"А\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2023.1.19.png": {
+  "answer": "201",
+  "type": "TYPE"
+ },
+ "previousNMT/2023.1.2.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.20.png": {
+  "answer": "3360",
+  "type": "TYPE"
+ },
+ "previousNMT/2023.1.21.png": {
+  "answer": "1920",
+  "type": "TYPE"
+ },
+ "previousNMT/2023.1.22.png": {
+  "answer": "4",
+  "type": "TYPE"
+ },
+ "previousNMT/2023.1.3.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.4.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.6.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.7.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.8.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2023.1.9.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.1.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.10.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.11.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.12.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.13.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.14.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.15.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.16.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"Г\", \"3\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2024.1.17.png": {
+  "answer": "{\"1\": \"А\", \"2\": \"Б\", \"3\": \"Д\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2024.1.18.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"Г\", \"3\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "previousNMT/2024.1.19.png": {
+  "answer": "10",
+  "type": "TYPE"
+ },
+ "previousNMT/2024.1.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.20.png": {
+  "answer": "23",
+  "type": "TYPE"
+ },
+ "previousNMT/2024.1.21.png": {
+  "answer": "3000",
+  "type": "TYPE"
+ },
+ "previousNMT/2024.1.22.png": {
+  "answer": "-92.8",
+  "type": "TYPE"
+ },
+ "previousNMT/2024.1.3.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.4.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.6.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.7.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.8.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "previousNMT/2024.1.9.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/111.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"В\", \"3\": \"Б\", \"4\": \"А\"}",
+  "type": "MATCH"
+ },
+ "quick_test/112.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/113.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "quick_test/114.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"Б\", \"3\": \"В\"}",
+  "type": "MATCH"
+ },
+ "quick_test/121.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/122.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "quick_test/123.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"А\", \"3\": \"В\"}",
+  "type": "MATCH"
+ },
+ "quick_test/124.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "quick_test/125.png": {
+  "answer": "21",
+  "type": "TYPE"
+ },
+ "quick_test/131.png": {
+  "answer": "750",
+  "type": "TYPE"
+ },
+ "quick_test/132.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "quick_test/133.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/134.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"Г\", \"3\": \"А\", \"4\": \"Д\"}",
+  "type": "MATCH"
+ },
+ "quick_test/135.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "quick_test/136.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/141.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/142.png": {
+  "answer": "{\"1\": \"Б\", \"2\": \"Г\", \"3\": \"А\", \"4\": \"В\"}",
+  "type": "MATCH"
+ },
+ "quick_test/211.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "quick_test/212.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "quick_test/213.png": {
+  "answer": "7.5",
+  "type": "TYPE"
+ },
+ "quick_test/214.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "quick_test/217.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "quick_test/221.png": {
+  "answer": "110.5",
+  "type": "TYPE"
+ },
+ "quick_test/222.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"В\", \"3\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "quick_test/223.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "quick_test/224.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "quick_test/225.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/1.1.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/1.2.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/1.3.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/1.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/1.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/10.1.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/10.2.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/10.3.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/10.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/10.5.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/11.1.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/11.2.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/11.3.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"В\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/11.4.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/11.5.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"Г\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/12.1.png": {
+  "answer": "-22",
+  "type": "TYPE"
+ },
+ "sections/12.2.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/12.3.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/12.4.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/12.5.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/13.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/13.2.png": {
+  "answer": "0.1",
+  "type": "TYPE"
+ },
+ "sections/13.3.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"Г\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/13.4.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/13.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/14.1.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"В\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/14.2.png": {
+  "answer": "-22",
+  "type": "TYPE"
+ },
+ "sections/14.3.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/14.4.png": {
+  "answer": "40.5",
+  "type": "TYPE"
+ },
+ "sections/14.5.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/15.1.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"В\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/15.2.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/15.3.png": {
+  "answer": "12",
+  "type": "TYPE"
+ },
+ "sections/15.4.png": {
+  "answer": "38.5",
+  "type": "TYPE"
+ },
+ "sections/15.5.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/16.1.png": {
+  "answer": "12",
+  "type": "TYPE"
+ },
+ "sections/16.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/16.3.png": {
+  "answer": "15",
+  "type": "TYPE"
+ },
+ "sections/16.4.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/16.5.png": {
+  "answer": "0.002",
+  "type": "TYPE"
+ },
+ "sections/17.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/17.2.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/17.3.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/17.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/17.5.png": {
+  "answer": "2.5",
+  "type": "TYPE"
+ },
+ "sections/18.1.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/18.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/18.3.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/18.4.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/18.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/19.1.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/19.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/19.3.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/19.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/19.5.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/2.1.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"Г\", \"3\": \"Б\", \"4\": \"В\"}",
+  "type": "MATCH"
+ },
+ "sections/2.2.png": {
+  "answer": "280",
+  "type": "TYPE"
+ },
+ "sections/2.3.png": {
+  "answer": "125",
+  "type": "TYPE"
+ },
+ "sections/2.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/2.5.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/20.1.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/20.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/20.3.png": {
+  "answer": "1.62",
+  "type": "TYPE"
+ },
+ "sections/20.4.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/20.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/21.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/21.2.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/21.3.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/21.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/21.5.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/22.1.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/22.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/22.3.png": {
+  "answer": "13",
+  "type": "TYPE"
+ },
+ "sections/22.4.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/22.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/23.1.png": {
+  "answer": "1.62",
+  "type": "TYPE"
+ },
+ "sections/23.2.png": {
+  "answer": "5.25",
+  "type": "TYPE"
+ },
+ "sections/23.3.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/23.4.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/23.5.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/24.1.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/24.2.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"Г\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/24.3.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"В\", \"3\": \"Д\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/24.4.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/24.5.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"Д\", \"3\": \"А\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/25.1.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/25.2.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/25.3.png": {
+  "answer": "{\"1\": \"В\", \"2\": \"Б\", \"3\": \"Д\", \"4\": \"А\"}",
+  "type": "MATCH"
+ },
+ "sections/25.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/25.5.png": {
+  "answer": "{\"1\": \"Б\", \"2\": \"А\", \"3\": \"Д\", \"4\": \"В\"}",
+  "type": "MATCH"
+ },
+ "sections/26.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/26.2.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/26.3.png": {
+  "answer": "900",
+  "type": "TYPE"
+ },
+ "sections/26.4.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/26.5.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/27.1.png": {
+  "answer": "6.3",
+  "type": "TYPE"
+ },
+ "sections/27.2.png": {
+  "answer": "96",
+  "type": "TYPE"
+ },
+ "sections/27.3.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/27.4.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/27.5.png": {
+  "answer": "72",
+  "type": "TYPE"
+ },
+ "sections/28.1.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/28.2.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"А\", \"3\": \"В\", \"4\": \"Д\"}",
+  "type": "MATCH"
+ },
+ "sections/28.3.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/28.4.png": {
+  "answer": "{\"1\": \"Г\", \"2\": \"А\", \"3\": \"В\", \"4\": \"Б\"}",
+  "type": "MATCH"
+ },
+ "sections/28.5.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/29.1.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/29.2.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/29.3.png": {
+  "answer": "{\"1\": \"Б\", \"2\": \"Г\", \"3\": \"А\", \"4\": \"Д\"}",
+  "type": "MATCH"
+ },
+ "sections/29.4.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/29.5.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"Б\", \"3\": \"А\", \"4\": \"Г\"}",
+  "type": "MATCH"
+ },
+ "sections/3.1.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/3.2.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/3.3.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/3.4.png": {
+  "answer": "80",
+  "type": "TYPE"
+ },
+ "sections/3.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/4.1.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/4.2.png": {
+  "answer": "-0.204",
+  "type": "TYPE"
+ },
+ "sections/4.3.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/4.4.png": {
+  "answer": "1.5",
+  "type": "TYPE"
+ },
+ "sections/4.5.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/5.1.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/5.2.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/5.3.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/5.4.png": {
+  "answer": "-130",
+  "type": "TYPE"
+ },
+ "sections/5.5.png": {
+  "answer": "Г",
+  "type": "ONE"
+ },
+ "sections/6.1.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/6.2.png": {
+  "answer": "-14.3",
+  "type": "TYPE"
+ },
+ "sections/6.3.png": {
+  "answer": "-1.625",
+  "type": "TYPE"
+ },
+ "sections/6.4.png": {
+  "answer": "{\"1\": \"А\", \"2\": \"В\", \"3\": \"Б\", \"4\": \"Д\"}",
+  "type": "MATCH"
+ },
+ "sections/6.5.png": {
+  "answer": "5.5",
+  "type": "TYPE"
+ },
+ "sections/7.1.png": {
+  "answer": "-14.3",
+  "type": "TYPE"
+ },
+ "sections/7.2.png": {
+  "answer": "-1.25",
+  "type": "TYPE"
+ },
+ "sections/7.3.png": {
+  "answer": "В",
+  "type": "ONE"
+ },
+ "sections/7.4.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/7.5.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/8.1.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/8.2.png": {
+  "answer": "Д",
+  "type": "ONE"
+ },
+ "sections/8.3.png": {
+  "answer": "34",
+  "type": "TYPE"
+ },
+ "sections/8.4.png": {
+  "answer": "А",
+  "type": "ONE"
+ },
+ "sections/8.5.png": {
+  "answer": "Б",
+  "type": "ONE"
+ },
+ "sections/9.1.png": {
+  "answer": "48",
+  "type": "TYPE"
+ },
+ "sections/9.2.png": {
+  "answer": "{\"1\": \"Д\", \"2\": \"А\", \"3\": \"Б\", \"4\": \"В\"}",
+  "type": "MATCH"
+ },
+ "sections/9.3.png": {
+  "answer": "7",
+  "type": "TYPE"
+ },
+ "sections/9.4.png": {
+  "answer": "42",
+  "type": "TYPE"
+ },
+ "sections/9.5.png": {
+  "answer": "9.5",
+  "type": "TYPE"
+ }
+}
