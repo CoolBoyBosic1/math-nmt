@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { errorResponse } from "@/lib/api-error";
 
 export async function DELETE(request: Request, context: { params: Promise<{ planID: string, topicID: string, taskID: string }> }) {
     try {
@@ -17,6 +18,6 @@ export async function DELETE(request: Request, context: { params: Promise<{ plan
         return NextResponse.json(deletedPlanTask, { status: 200 });
     }
     catch (error) {
-        return NextResponse.json({ error: `TaskID error: ${error.message}` }, { status: 503 });
+        return errorResponse(error, "DELETE /api/plans/[planID]/topics/[topicID]/tasks/[taskID]");
     }
 }

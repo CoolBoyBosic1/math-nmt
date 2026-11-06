@@ -6,7 +6,7 @@ const prisma = vi.hoisted(() => ({
   user: { create: vi.fn(), update: vi.fn(), findMany: vi.fn() },
   topic: { findMany: vi.fn(), findUniqueOrThrow: vi.fn() },
   task: { create: vi.fn() },
-  plan: { create: vi.fn(), findUnique: vi.fn() },
+  plan: { create: vi.fn(), findUnique: vi.fn(), findUniqueOrThrow: vi.fn() },
   userTask: { findMany: vi.fn() },
 }));
 vi.mock("@/lib/db", () => ({ prisma }));
@@ -17,6 +17,7 @@ import * as topics from "@/app/api/topics/route";
 import * as topicById from "@/app/api/topics/[topicID]/route";
 import * as topicTasks from "@/app/api/topics/[topicID]/tasks/route";
 import * as plans from "@/app/api/plans/route";
+import * as planById from "@/app/api/plans/[planID]/route";
 import * as planProgress from "@/app/api/plans/[planID]/progress/route";
 import * as userProgress from "@/app/api/progress/[userID]/route";
 
@@ -76,9 +77,10 @@ describe("IT-05..07 теми та задачі", () => {
 });
 
 describe("IT-08..10 план і прогрес", () => {
-  it("IT-08 POST /api/plans без userID → помилка", async () => {
+  it("IT-08 POST /api/plans без userID → 400", async () => {
     const res = await plans.POST(req({ hours: 10 }));
-    expect(res.status).toBe(503);
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toBe("Require userID");
     expect(prisma.plan.create).not.toHaveBeenCalled();
   });
   it("IT-09 прогрес плану: статуси red / yellow / green за темами", async () => {
@@ -107,5 +109,31 @@ describe("IT-08..10 план і прогрес", () => {
     ]);
     const res = await userProgress.GET(req(), { params: Promise.resolve({ userID: "u1" }) });
     expect((await res.json()).progress).toEqual({ A: { solved: 1, errors: 1 }, B: { solved: 1, errors: 0 } });
+  });
+});
+
+describe("IT-17..20 обробка помилок і дозволені поля плану", () => {
+  const inMonth = () => new Date(Date.now() + 30 * 864e5).toISOString();
+
+  it("IT-17 POST /api/plans зберігає лише userID, hours, endDate", async () => {
+    prisma.plan.create.mockResolvedValue({ id: "p1" });
+    const endDate = inMonth();
+    const res = await plans.POST(req({ userID: "u1", hours: 10, endDate, id: "hacked", startDate: "2000-01-01" }));
+    expect(res.status).toBe(200);
+    expect(prisma.plan.create.mock.calls[0][0].data).toEqual({ userID: "u1", hours: 10, endDate });
+  });
+  it("IT-18 POST /api/plans з невалідними годинами → 400", async () => {
+    const res = await plans.POST(req({ userID: "u1", hours: 0, endDate: inMonth() }));
+    expect(res.status).toBe(400);
+    expect(prisma.plan.create).not.toHaveBeenCalled();
+  });
+  it("IT-19 POST /api/plans з некоректним JSON → 400", async () => {
+    const res = await plans.POST(new Request("http://test.local", { method: "POST", body: "{not json" }));
+    expect(res.status).toBe(400);
+  });
+  it("IT-20 GET /api/plans/[id] неіснуючого плану (P2025) → 404", async () => {
+    prisma.plan.findUniqueOrThrow.mockRejectedValue({ code: "P2025" });
+    const res = await planById.GET(req(), { params: Promise.resolve({ planID: "missing" }) });
+    expect(res.status).toBe(404);
   });
 });

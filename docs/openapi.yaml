@@ -101,6 +101,7 @@ paths:
       summary: Усі теми (дерево через parentID)
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Topic" } } } } }
+        "500": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
     post:
       tags: [Topics]
@@ -109,6 +110,8 @@ paths:
       responses:
         "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Topic" } } } }
         "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/topics/{topicID}:
     parameters: [{ $ref: "#/components/parameters/topicID" }]
@@ -190,6 +193,7 @@ paths:
       summary: Усі плани
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Plan" } } } } }
+        "500": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
     post:
       tags: [Plans]
@@ -198,7 +202,9 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
       responses:
         "200": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/update:
     put:
@@ -227,27 +233,36 @@ paths:
       summary: План за ID
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     put:
       tags: [Plans]
       summary: Повне оновлення плану (hours, endDate обов’язкові)
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     patch:
       tags: [Plans]
       summary: Часткове оновлення плану
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     delete:
       tags: [Plans]
       summary: Видалити план
       responses:
         "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/{planID}/topics:
     parameters: [{ $ref: "#/components/parameters/planID" }]
@@ -265,7 +280,9 @@ paths:
       summary: Задачі теми, що входять до плану, зі статусом користувача
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Task" } } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     post:
       tags: [Plans, Tasks]
       summary: Додати задачу до плану
@@ -274,7 +291,9 @@ paths:
         content: { application/json: { schema: { type: object, required: [taskID], properties: { taskID: { type: string, format: uuid } } } } }
       responses:
         "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/PlanTask" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/{planID}/topics/{topicID}/tasks/{taskID}:
     parameters: [{ $ref: "#/components/parameters/planID" }, { $ref: "#/components/parameters/topicID" }, { $ref: "#/components/parameters/taskID" }]
@@ -283,7 +302,9 @@ paths:
       summary: Прибрати задачу з плану
       responses:
         "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/PlanTask" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/{planID}/progress:
     parameters: [{ $ref: "#/components/parameters/planID" }]
@@ -329,7 +350,7 @@ components:
     planID: { name: planID, in: path, required: true, schema: { type: string, format: uuid } }
   responses:
     Error:
-      description: Помилка
+      description: "Помилка. 400 — некоректні дані або формат id; 404 — запис не знайдено; 409 — дублікат або порушено зв’язок між записами; 500 — внутрішня помилка; 503 — БД недоступна."
       content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
   schemas:
     Error:

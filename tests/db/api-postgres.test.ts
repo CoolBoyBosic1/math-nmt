@@ -6,6 +6,7 @@ import * as users from "@/app/api/users/route";
 import * as topics from "@/app/api/topics/route";
 import * as topicById from "@/app/api/topics/[topicID]/route";
 import * as plans from "@/app/api/plans/route";
+import * as planById from "@/app/api/plans/[planID]/route";
 import * as planProgress from "@/app/api/plans/[planID]/progress/route";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
@@ -15,7 +16,7 @@ const NMT_2024 = "6a7b3225-93ec-4998-8844-cfb2d319688d";
 const post = (body: unknown) => new Request("http://test.local", { method: "POST", body: JSON.stringify(body) });
 const createdUsers: string[] = [];
 
-describe.skipIf(!hasDb)("IT-11..16 API + PostgreSQL", () => {
+describe.skipIf(!hasDb)("IT-11..16, IT-21..22 API + PostgreSQL", () => {
   afterAll(async () => {
     if (!hasDb) return;
     await prisma.plan.deleteMany({ where: { userID: { in: createdUsers } } });
@@ -76,5 +77,17 @@ describe.skipIf(!hasDb)("IT-11..16 API + PostgreSQL", () => {
     expect(plan.hours).toBe(8);
     const prog = await planProgress.GET(new Request("http://test.local"), { params: Promise.resolve({ planID: plan.id }) });
     expect((await prog.json()).topicProgress).toEqual([]);
+  });
+
+  it("IT-21 GET /api/plans/[id] з некоректним UUID → 400, неіснуючий план → 404", async () => {
+    const get = (planID: string) => planById.GET(new Request("http://test.local"), { params: Promise.resolve({ planID }) });
+    expect((await get("not-a-uuid")).status).toBe(400);
+    expect((await get("00000000-0000-0000-0000-000000000000")).status).toBe(404);
+  });
+
+  it("IT-22 POST /api/plans для неіснуючого користувача → 409, а не 500", async () => {
+    const endDate = new Date(Date.now() + 30 * 864e5).toISOString();
+    const res = await plans.POST(post({ userID: "00000000-0000-0000-0000-000000000000", hours: 5, endDate }));
+    expect(res.status).toBe(409);
   });
 });
