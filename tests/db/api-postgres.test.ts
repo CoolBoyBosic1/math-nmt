@@ -7,6 +7,7 @@ import * as topics from "@/app/api/topics/route";
 import * as topicById from "@/app/api/topics/[topicID]/route";
 import * as plans from "@/app/api/plans/route";
 import * as planById from "@/app/api/plans/[planID]/route";
+import { authorizeCredentials } from "@/lib/auth-credentials";
 import * as planProgress from "@/app/api/plans/[planID]/progress/route";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
@@ -16,7 +17,7 @@ const NMT_2024 = "6a7b3225-93ec-4998-8844-cfb2d319688d";
 const post = (body: unknown) => new Request("http://test.local", { method: "POST", body: JSON.stringify(body) });
 const createdUsers: string[] = [];
 
-describe.skipIf(!hasDb)("IT-11..16, IT-21..22 API + PostgreSQL", () => {
+describe.skipIf(!hasDb)("IT-11..16, IT-21..22, IT-26 API + PostgreSQL", () => {
   afterAll(async () => {
     if (!hasDb) return;
     await prisma.plan.deleteMany({ where: { userID: { in: createdUsers } } });
@@ -89,5 +90,14 @@ describe.skipIf(!hasDb)("IT-11..16, IT-21..22 API + PostgreSQL", () => {
     const endDate = new Date(Date.now() + 30 * 864e5).toISOString();
     const res = await plans.POST(post({ userID: "00000000-0000-0000-0000-000000000000", hours: 5, endDate }));
     expect(res.status).toBe(409);
+  });
+
+  it("IT-26 вхід: правильний пароль → користувач, хибний пароль чи невідомий email → null", async () => {
+    const email = `login-${Date.now()}@matnmt.local`;
+    const created = await (await users.POST(post({ nickname: "login1", email, password: "Aa123456!" }))).json();
+    createdUsers.push(created.id);
+    expect(await authorizeCredentials(email, "Aa123456!")).toEqual({ id: created.id, email, name: "login1" });
+    expect(await authorizeCredentials(email, "Aa123456?")).toBeNull();
+    expect(await authorizeCredentials(`nobody-${Date.now()}@matnmt.local`, "Aa123456!")).toBeNull();
   });
 });

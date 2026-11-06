@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { isValidPassword, PASSWORD_RULE } from '@/lib/validator/user';
 
 export default function RegisterOrLogin() {
@@ -43,6 +44,23 @@ export default function RegisterOrLogin() {
     return true;
   };
 
+  // Вхід через Auth.js. Після успіху повертаємось туди, звідки прийшли (?callbackUrl=...),
+  // і повністю перезавантажуємо сторінку, щоб шапка й сторінки побачили нову сесію.
+  const logIn = async () => {
+    const result = await signIn('credentials', {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    });
+    if (!result || result.error) {
+      throw new Error('Невірна пошта або пароль');
+    }
+    const callbackUrl = new URLSearchParams(window.location.search).get('callbackUrl');
+    // Лише відносні адреси на цьому сайті, щоб ?callbackUrl= не перекидав на чужий домен.
+    const target = callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//') ? callbackUrl : '/';
+    window.location.assign(target);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -70,14 +88,11 @@ export default function RegisterOrLogin() {
           throw new Error(data.error || "Помилка реєстрації");
         }
 
-        alert("Реєстрація успішна! Увійдіть");
-        setIsRegister(false);
-        setFormData({ nickname: '', email: '', password: '', confirmPassword: '' });
+        // Після реєстрації одразу входимо тими самими даними.
+        await logIn();
 
       } else {
-        // Тут буде логіка входу (потрібно реалізувати окремий API)
-        console.log('Логін:', formData);
-        alert('Функція входу ще не реалізована');
+        await logIn();
       }
 
     } catch (error) {
