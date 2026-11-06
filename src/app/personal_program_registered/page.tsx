@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { DEMO_USER_ID } from "@/lib/demo";
+import { useSession } from "next-auth/react";
 
 /* ієрархічна структура тем */
 const rawTopics = [
@@ -260,6 +260,31 @@ async function fetchUserProgress(userId: string) {
   }
 }
 
+type TopicProgress = { solved: number; errors: number };
+
+/**
+ * API повертає прогрес за id теми, а план будується за назвами тем.
+ * Перекладаємо id → назва; для великих тем («Повторення») сумуємо їхні підтеми.
+ */
+async function progressByTitle(progressById: Record<string, TopicProgress>) {
+  const res = await fetch(`/api/topics`, { cache: "no-store" });
+  if (!res.ok) return {};
+  const topics: { id: string; title: string }[] = await res.json();
+  const byTitle: Record<string, TopicProgress> = {};
+  for (const t of topics) {
+    if (progressById[t.id]) byTitle[t.title] = progressById[t.id];
+  }
+  for (const parent of rawTopics) {
+    const sum = { solved: 0, errors: 0 };
+    for (const sub of parent.subtopics ?? []) {
+      sum.solved += byTitle[sub.name]?.solved ?? 0;
+      sum.errors += byTitle[sub.name]?.errors ?? 0;
+    }
+    byTitle[parent.name] = sum;
+  }
+  return byTitle;
+}
+
 /**
  * Функція updateTheoryStatus надсилає оновлення стану теорії для теми.
  */
@@ -292,9 +317,17 @@ export default function StudyPlanPage() {
   const [error, setError] = useState<string | null>(null);
   const [theoryCompleted, setTheoryCompleted] = useState<{ [id: string]: boolean }>({});
 
-  const userId = DEMO_USER_ID; // TODO (Sprint 5): брати ID із сесії
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id;
 
   useEffect(() => {
+    // План особистий: гостя відправляємо на вхід і потім повертаємо сюди.
+    if (status === "loading") return;
+    if (status === "unauthenticated" || !userId) {
+      router.replace("/register?callbackUrl=/personal_program_registered");
+      return;
+    }
+
     async function fetchData() {
       try {
         const resPlan = await fetch(`/api/users/${userId}/plan`, { cache: "no-store" });
@@ -302,9 +335,14 @@ export default function StudyPlanPage() {
           throw new Error(`Помилка завантаження плану: ${resPlan.status}`);
         }
         const planData = await resPlan.json();
+        if (!planData.plan) {
+          // Плану ще немає — ведемо на форму його створення.
+          router.replace("/personal_program");
+          return;
+        }
         setUserPlanData(planData);
 
-        const userProgress = await fetchUserProgress(userId);
+        const userProgress = await progressByTitle(await fetchUserProgress(userId));
 
         const flatSmallTopics = flattenLeafTopics(rawTopics);
         const smallTopics = flatSmallTopics.map((t) => ({
@@ -374,7 +412,7 @@ export default function StudyPlanPage() {
       }
     }
     fetchData();
-  }, [userId]);
+  }, [userId, status, router]);
 
   const handleTheoryToggle = (id: string, topic: string) => {
     const newValue = !theoryCompleted[id];

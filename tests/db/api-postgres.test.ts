@@ -1,6 +1,10 @@
 // Інтеграційні тести на справжній PostgreSQL (БД після міграції та seed).
 // Запускаються, лише якщо задано DATABASE_URL; у CI піднімається сервіс postgres.
-import { describe, it, expect, afterAll } from "vitest";
+import { describe, it, expect, afterAll, vi } from "vitest";
+
+// Сесія Auth.js підміняється: тест сам вирішує, хто «увійшов».
+const auth = vi.hoisted(() => ({ currentUserId: vi.fn() }));
+vi.mock("@/auth", () => auth);
 import { prisma } from "@/lib/db";
 import * as users from "@/app/api/users/route";
 import * as topics from "@/app/api/topics/route";
@@ -70,9 +74,10 @@ describe.skipIf(!hasDb)("IT-11..16, IT-21..22, IT-26 API + PostgreSQL", () => {
 
   it("IT-16 створення плану і порожній прогрес", async () => {
     const userId = createdUsers[0];
+    auth.currentUserId.mockResolvedValue(userId);
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 120);
-    const res = await plans.POST(post({ userID: userId, hours: 8, endDate: endDate.toISOString() }));
+    const res = await plans.POST(post({ hours: 8, endDate: endDate.toISOString() }));
     const plan = await res.json();
     expect(res.status).toBe(200);
     expect(plan.hours).toBe(8);
@@ -86,9 +91,10 @@ describe.skipIf(!hasDb)("IT-11..16, IT-21..22, IT-26 API + PostgreSQL", () => {
     expect((await get("00000000-0000-0000-0000-000000000000")).status).toBe(404);
   });
 
-  it("IT-22 POST /api/plans для неіснуючого користувача → 409, а не 500", async () => {
+  it("IT-22 POST /api/plans, коли користувача із сесії вже видалено → 409, а не 500", async () => {
+    auth.currentUserId.mockResolvedValue("00000000-0000-0000-0000-000000000000");
     const endDate = new Date(Date.now() + 30 * 864e5).toISOString();
-    const res = await plans.POST(post({ userID: "00000000-0000-0000-0000-000000000000", hours: 5, endDate }));
+    const res = await plans.POST(post({ hours: 5, endDate }));
     expect(res.status).toBe(409);
   });
 

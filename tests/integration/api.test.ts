@@ -10,6 +10,9 @@ const prisma = vi.hoisted(() => ({
   userTask: { findMany: vi.fn() },
 }));
 vi.mock("@/lib/db", () => ({ prisma }));
+// Сесія Auth.js: за замовчуванням увійшов користувач u1 (див. beforeEach).
+const auth = vi.hoisted(() => ({ currentUserId: vi.fn() }));
+vi.mock("@/auth", () => auth);
 
 import * as users from "@/app/api/users/route";
 import * as userById from "@/app/api/users/[userID]/route";
@@ -24,7 +27,10 @@ import * as userProgress from "@/app/api/progress/[userID]/route";
 const req = (body?: unknown) =>
   new Request("http://test.local", { method: "POST", body: body ? JSON.stringify(body) : undefined });
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  auth.currentUserId.mockResolvedValue("u1");
+});
 
 describe("IT-01..03 POST /api/users — реєстрація", () => {
   it("IT-01 коректні дані → 200 і запис у БД", async () => {
@@ -77,10 +83,10 @@ describe("IT-05..07 теми та задачі", () => {
 });
 
 describe("IT-08..10 план і прогрес", () => {
-  it("IT-08 POST /api/plans без userID → 400", async () => {
+  it("IT-08 POST /api/plans без входу → 401", async () => {
+    auth.currentUserId.mockResolvedValue(null);
     const res = await plans.POST(req({ hours: 10 }));
-    expect(res.status).toBe(400);
-    expect((await res.json()).error).toBe("Require userID");
+    expect(res.status).toBe(401);
     expect(prisma.plan.create).not.toHaveBeenCalled();
   });
   it("IT-09 прогрес плану: статуси red / yellow / green за темами", async () => {
@@ -115,10 +121,10 @@ describe("IT-08..10 план і прогрес", () => {
 describe("IT-17..20 обробка помилок і дозволені поля плану", () => {
   const inMonth = () => new Date(Date.now() + 30 * 864e5).toISOString();
 
-  it("IT-17 POST /api/plans зберігає лише userID, hours, endDate", async () => {
+  it("IT-17 POST /api/plans: userID із сесії, з body лише hours і endDate", async () => {
     prisma.plan.create.mockResolvedValue({ id: "p1" });
     const endDate = inMonth();
-    const res = await plans.POST(req({ userID: "u1", hours: 10, endDate, id: "hacked", startDate: "2000-01-01" }));
+    const res = await plans.POST(req({ userID: "someone-else", hours: 10, endDate, id: "hacked", startDate: "2000-01-01" }));
     expect(res.status).toBe(200);
     expect(prisma.plan.create.mock.calls[0][0].data).toEqual({ userID: "u1", hours: 10, endDate });
   });
@@ -156,5 +162,16 @@ describe("IT-23..25 маршрути users: пароль і дозволені �
     await userById.PATCH(req({ nickname: "newnick", id: "hacked" }), { params: Promise.resolve({ userID: "u1" }) });
     expect(prisma.user.update.mock.calls[0][0].data.id).toBeUndefined();
     expect(prisma.user.update.mock.calls[0][0].data.nickname).toBe("newnick");
+  });
+});
+
+describe("IT-27 доступ лише до власних даних", () => {
+  it("IT-27 прогрес іншого користувача → 403, без входу → 401", async () => {
+    const res = await userProgress.GET(req(), { params: Promise.resolve({ userID: "u2" }) });
+    expect(res.status).toBe(403);
+    auth.currentUserId.mockResolvedValue(null);
+    const anon = await userProgress.GET(req(), { params: Promise.resolve({ userID: "u1" }) });
+    expect(anon.status).toBe(401);
+    expect(prisma.userTask.findMany).not.toHaveBeenCalled();
   });
 });

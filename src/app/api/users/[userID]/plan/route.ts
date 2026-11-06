@@ -2,14 +2,16 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { errorResponse } from "@/lib/api-error";
+import { requireSelf } from "@/lib/session";
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ userID: string }> }
 ) {
   try {
-    // Отримуємо userID з параметрів URL (без await)
     const { userID: userId } = await params;
+    await requireSelf(userId); // лише власний план
 
     // Запит до бази даних для пошуку користувача та отримання останнього плану
     const user = await prisma.user.findUnique({
@@ -51,11 +53,7 @@ export async function GET(
     };
 
     return NextResponse.json(response);
-  } catch (error: any) {
-    console.error("Error fetching user plan data:", error?.message ?? error);
-    return NextResponse.json(
-      { error: "Сталася помилка при отриманні даних плану" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return errorResponse(error, "GET /api/users/[userID]/plan");
   }
 }
