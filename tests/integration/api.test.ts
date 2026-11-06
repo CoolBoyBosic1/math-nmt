@@ -137,3 +137,24 @@ describe("IT-17..20 обробка помилок і дозволені поля
     expect(res.status).toBe(404);
   });
 });
+
+describe("IT-23..25 маршрути users: пароль і дозволені поля", () => {
+  it("IT-23 реєстрація з паролем зі спецсимволами (Aa123456!) → 200", async () => {
+    prisma.user.create.mockResolvedValue({ id: "u1" });
+    const res = await users.POST(req({ nickname: "nikname", email: "t@ua.ua", password: "Aa123456!" }));
+    expect(res.status).toBe(200);
+  });
+  it("IT-24 реєстрація передає в БД лише nickname, email, firstName, хеш пароля", async () => {
+    prisma.user.create.mockResolvedValue({ id: "u1" });
+    await users.POST(req({ nickname: "nikname", email: "t@ua.ua", password: "abcd1234", id: "hacked" }));
+    const { data } = prisma.user.create.mock.calls[0][0];
+    expect(Object.keys(data).sort()).toEqual(["email", "firstName", "nickname", "password"]);
+    expect(data.id).toBeUndefined();
+  });
+  it("IT-25 PATCH /api/users/[id] ігнорує поле id", async () => {
+    prisma.user.update.mockResolvedValue({ id: "u1" });
+    await userById.PATCH(req({ nickname: "newnick", id: "hacked" }), { params: Promise.resolve({ userID: "u1" }) });
+    expect(prisma.user.update.mock.calls[0][0].data.id).toBeUndefined();
+    expect(prisma.user.update.mock.calls[0][0].data.nickname).toBe("newnick");
+  });
+});

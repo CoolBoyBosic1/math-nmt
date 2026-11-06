@@ -37,11 +37,15 @@ describe("UT-08..11 isValidPassword", () => {
   it("UT-09 відхиляє пароль із 7 символів", () => {
     expect(isValidPassword("abc1234")).toBe(false);
   });
-  it("UT-10 відхиляє пароль із 21 символу", () => {
-    expect(isValidPassword("a1".repeat(10) + "b")).toBe(false);
+  it("UT-10 приймає 64 символи, відхиляє 65 і пароль довший за 72 байти", () => {
+    expect(isValidPassword("a1".repeat(32))).toBe(true);
+    expect(isValidPassword("a1".repeat(32) + "b")).toBe(false);
+    expect(isValidPassword("пароль".repeat(7))).toBe(false); // 42 символи, але 84 байти
   });
-  it("UT-11 відхиляє пароль зі спецсимволом", () => {
-    expect(isValidPassword("abcd123!")).toBe(false);
+  it("UT-11 приймає спецсимволи, відхиляє пробіли", () => {
+    expect(isValidPassword("Aa123456!")).toBe(true);
+    expect(isValidPassword("p@ss#w0rd_$")).toBe(true);
+    expect(isValidPassword("abcd 1234")).toBe(false);
   });
 });
 

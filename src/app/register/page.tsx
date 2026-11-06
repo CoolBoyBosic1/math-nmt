@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { isValidPassword, PASSWORD_RULE } from '@/lib/validator/user';
 
 export default function RegisterOrLogin() {
   const [isRegister, setIsRegister] = useState(false);
@@ -27,9 +28,8 @@ export default function RegisterOrLogin() {
         return false;
       }
 
-      const passwordRegex = /^[A-Za-z0-9]{8,20}$/;
-      if (!passwordRegex.test(formData.password)) {
-        setError("Пароль 8-20 символів (A-Z, a-z, 0-9)");
+      if (!isValidPassword(formData.password)) {
+        setError(PASSWORD_RULE);
         return false;
       }
     }
@@ -144,7 +144,7 @@ export default function RegisterOrLogin() {
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
               className="form-control"
-              placeholder={isRegister ? "8-20 символів (A-Z, a-z, 0-9)" : "Введіть пароль"}
+              placeholder={isRegister ? "8–64 символи, можна спецсимволи" : "Введіть пароль"}
             />
           </div>
 
