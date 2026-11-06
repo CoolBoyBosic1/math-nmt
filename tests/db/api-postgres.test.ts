@@ -12,6 +12,8 @@ import * as topicById from "@/app/api/topics/[topicID]/route";
 import * as plans from "@/app/api/plans/route";
 import * as planById from "@/app/api/plans/[planID]/route";
 import { authorizeCredentials } from "@/lib/auth-credentials";
+import * as attempts from "@/app/api/attempts/route";
+import * as userProgress from "@/app/api/progress/[userID]/route";
 import * as planProgress from "@/app/api/plans/[planID]/progress/route";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
@@ -21,9 +23,10 @@ const NMT_2024 = "6a7b3225-93ec-4998-8844-cfb2d319688d";
 const post = (body: unknown) => new Request("http://test.local", { method: "POST", body: JSON.stringify(body) });
 const createdUsers: string[] = [];
 
-describe.skipIf(!hasDb)("IT-11..16, IT-21..22, IT-26 API + PostgreSQL", () => {
+describe.skipIf(!hasDb)("IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL", () => {
   afterAll(async () => {
     if (!hasDb) return;
+    await prisma.userTask.deleteMany({ where: { userID: { in: createdUsers } } });
     await prisma.plan.deleteMany({ where: { userID: { in: createdUsers } } });
     await prisma.user.deleteMany({ where: { id: { in: createdUsers } } });
     await prisma.$disconnect();
@@ -105,5 +108,19 @@ describe.skipIf(!hasDb)("IT-11..16, IT-21..22, IT-26 API + PostgreSQL", () => {
     expect(await authorizeCredentials(email, "Aa123456!")).toEqual({ id: created.id, email, name: "login1" });
     expect(await authorizeCredentials(email, "Aa123456?")).toBeNull();
     expect(await authorizeCredentials(`nobody-${Date.now()}@matnmt.local`, "Aa123456!")).toBeNull();
+  });
+
+  it("IT-32 відповіді зберігаються в БД і потрапляють у прогрес: спершу помилка, потім розв'язок", async () => {
+    const userId = createdUsers[0];
+    auth.currentUserId.mockResolvedValue(userId);
+    const task = await prisma.task.findFirstOrThrow({ where: { topicID: DERIVATIVE_TOPIC, type: "ONE" } });
+    const wrong = ["А", "Б", "В", "Г", "Д"].find((l) => l !== task.answer);
+
+    expect((await (await attempts.POST(post({ taskID: task.id, answer: wrong }))).json()).correct).toBe(false);
+    const get = () => userProgress.GET(new Request("http://test.local"), { params: Promise.resolve({ userID: userId }) });
+    expect((await (await get()).json()).progress[DERIVATIVE_TOPIC]).toEqual({ solved: 0, errors: 1 });
+
+    expect((await (await attempts.POST(post({ taskID: task.id, answer: task.answer }))).json()).correct).toBe(true);
+    expect((await (await get()).json()).progress[DERIVATIVE_TOPIC]).toEqual({ solved: 1, errors: 0 });
   });
 });

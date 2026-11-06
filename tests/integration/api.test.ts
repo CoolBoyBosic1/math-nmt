@@ -5,9 +5,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const prisma = vi.hoisted(() => ({
   user: { create: vi.fn(), update: vi.fn(), findMany: vi.fn() },
   topic: { findMany: vi.fn(), findUniqueOrThrow: vi.fn() },
-  task: { create: vi.fn() },
+  task: { create: vi.fn(), findUniqueOrThrow: vi.fn() },
   plan: { create: vi.fn(), findUnique: vi.fn(), findUniqueOrThrow: vi.fn() },
-  userTask: { findMany: vi.fn() },
+  userTask: { findMany: vi.fn(), findUnique: vi.fn(), upsert: vi.fn() },
 }));
 vi.mock("@/lib/db", () => ({ prisma }));
 // Сесія Auth.js: за замовчуванням увійшов користувач u1 (див. beforeEach).
@@ -23,6 +23,7 @@ import * as plans from "@/app/api/plans/route";
 import * as planById from "@/app/api/plans/[planID]/route";
 import * as planProgress from "@/app/api/plans/[planID]/progress/route";
 import * as userProgress from "@/app/api/progress/[userID]/route";
+import * as attempts from "@/app/api/attempts/route";
 
 const req = (body?: unknown) =>
   new Request("http://test.local", { method: "POST", body: body ? JSON.stringify(body) : undefined });
@@ -173,5 +174,39 @@ describe("IT-27 доступ лише до власних даних", () => {
     const anon = await userProgress.GET(req(), { params: Promise.resolve({ userID: "u1" }) });
     expect(anon.status).toBe(401);
     expect(prisma.userTask.findMany).not.toHaveBeenCalled();
+  });
+});
+
+describe("IT-28..31 POST /api/attempts — збереження відповідей", () => {
+  const task = { id: "t1", type: "ONE", answer: "Б" };
+
+  it("IT-28 без входу → 401, у БД нічого не пишеться", async () => {
+    auth.currentUserId.mockResolvedValue(null);
+    const res = await attempts.POST(req({ taskID: "t1", answer: "Б" }));
+    expect(res.status).toBe(401);
+    expect(prisma.userTask.upsert).not.toHaveBeenCalled();
+  });
+  it("IT-29 без taskID чи відповіді → 400", async () => {
+    expect((await attempts.POST(req({ answer: "Б" }))).status).toBe(400);
+    expect((await attempts.POST(req({ taskID: "t1" }))).status).toBe(400);
+  });
+  it("IT-30 правильна відповідь: сервер сам перевіряє і ставить passed_on", async () => {
+    prisma.task.findUniqueOrThrow.mockResolvedValue(task);
+    prisma.userTask.findUnique.mockResolvedValue(null);
+    prisma.userTask.upsert.mockImplementation(async (args: any) => ({ ...args.create }));
+    const res = await attempts.POST(req({ taskID: "t1", answer: "Б" }));
+    expect(await res.json()).toMatchObject({ correct: true, solved: true });
+    const { create } = prisma.userTask.upsert.mock.calls[0][0];
+    expect(create.userID).toBe("u1");
+    expect(create.passed_on).toBeInstanceOf(Date);
+  });
+  it("IT-31 хибна відповідь після правильної не скасовує розв'язок", async () => {
+    const solvedAt = new Date("2026-11-01");
+    prisma.task.findUniqueOrThrow.mockResolvedValue(task);
+    prisma.userTask.findUnique.mockResolvedValue({ passed_on: solvedAt });
+    prisma.userTask.upsert.mockResolvedValue({ passed_on: solvedAt });
+    const res = await attempts.POST(req({ taskID: "t1", answer: "В" }));
+    expect(await res.json()).toMatchObject({ correct: false, solved: true });
+    expect(prisma.userTask.upsert.mock.calls[0][0].update).toEqual({});
   });
 });

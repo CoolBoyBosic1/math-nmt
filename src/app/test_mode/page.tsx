@@ -4,7 +4,9 @@ import Confetti from "react-confetti";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { useSession } from "next-auth/react";
 import useUnsavedChangesWarning from "./routerWarning";
+import { saveAttempt } from "./saveAttempt";
 import { Topic, SampledTask, Task, MultipleLettersAnswer } from "./types";
 import { checkSingleLetterAnswer } from "./utils";
 import { TaskImage } from "../ui/test_mode/taskImage";
@@ -15,6 +17,7 @@ import './style.css';
 
 function TestModePageContent() {
   const router = useRouter();
+  const { status: sessionStatus } = useSession();
 
   const [sampledTasks, setSampledTasks] = useState<SampledTask[]>([]);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
@@ -191,6 +194,7 @@ function TestModePageContent() {
           setShowConfetti(true);
           setResults(prev => ({...prev, correct: prev.correct + 1}));
         }
+        if (sessionStatus === "authenticated") saveAttempt(currentTask.id, answer);
       } else {
         handleNextTask();
       }
