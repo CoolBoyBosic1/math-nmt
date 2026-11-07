@@ -8,6 +8,7 @@ import {
   formatTime,
   calculateCompletionTime,
   handleTestCompletion,
+  isCorrectAnswer,
 } from "@/app/test_mode/utils";
 
 const task = (type: string, answer: string) => ({ id: "t1", problem: "p", solution: "s", type, answer });
@@ -97,5 +98,25 @@ describe("UT-31..32 handleTestCompletion", () => {
     const router = { push: vi.fn() };
     handleTestCompletion({ startTime: null, shouldUseTimer: false, topicId: "t", results: { correct: 1, total: 2 }, router });
     expect(router.push).toHaveBeenCalledWith("/result_page?topicId=t&correct=1&total=2");
+  });
+});
+
+describe("UT-44..47 isCorrectAnswer — спільна перевірка для сторінки і сервера", () => {
+  it("UT-44 одна літера", () => {
+    expect(isCorrectAnswer({ type: "ONE", answer: "Б" }, "Б")).toBe(true);
+    expect(isCorrectAnswer({ type: "ONE", answer: "Б" }, "В")).toBe(false);
+  });
+  it("UT-45 число: кома і крапка рівнозначні", () => {
+    expect(isCorrectAnswer({ type: "TYPE", answer: "2,5" }, "2.5")).toBe(true);
+    expect(isCorrectAnswer({ type: "TYPE", answer: "2,5" }, "3")).toBe(false);
+  });
+  it("UT-46 відповідність: об'єкт або JSON-рядок", () => {
+    const task = { type: "MATCH", answer: '{"1":"А","2":"Б","3":"В"}' };
+    expect(isCorrectAnswer(task, { 1: "А", 2: "Б", 3: "В" })).toBe(true);
+    expect(isCorrectAnswer(task, '{"1":"А","2":"Б","3":"Г"}')).toBe(false);
+  });
+  it("UT-47 відповідь невірного формату не кидає помилку, а вважається хибною", () => {
+    expect(isCorrectAnswer({ type: "MATCH", answer: '{"1":"А"}' }, "не json")).toBe(false);
+    expect(isCorrectAnswer({ type: "ONE", answer: "А" }, { 1: "А" })).toBe(false);
   });
 });

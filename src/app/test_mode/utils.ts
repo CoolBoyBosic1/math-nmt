@@ -77,3 +77,24 @@ export const handleTestCompletion = ({
     `/result_page?topicId=${topicId}&correct=${results.correct}&total=${results.total}${timeParam}`
   );
 };
+
+// Перевірка відповіді будь-якого типу. Використовується і на сторінці тесту, і на сервері
+// (POST /api/attempts), щоб результат не залежав від того, що надіслав браузер.
+export function isCorrectAnswer(task: Pick<Task, 'type' | 'answer'>, userAnswer: unknown): boolean {
+  switch (getAnswerType(task as Task)) {
+    case 'singleLetter':
+      return typeof userAnswer === 'string' && checkSingleLetterAnswer(userAnswer, task.answer);
+    case 'multipleLetters': {
+      try {
+        const correct = JSON.parse(task.answer) as MultipleLettersAnswer;
+        const given = typeof userAnswer === 'string' ? JSON.parse(userAnswer) : userAnswer;
+        if (!given || typeof given !== 'object') return false;
+        return checkMultipleLettersAnswer(given as MultipleLettersAnswer, correct);
+      } catch {
+        return false;
+      }
+    }
+    case 'number':
+      return typeof userAnswer === 'string' && checkNumberAnswer(userAnswer, task.answer);
+  }
+}

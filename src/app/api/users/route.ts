@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { isValidNickname, isValidEmail, isValidPassword } from "@/lib/validator/user";
+import { isValidNickname, isValidEmail, isValidPassword, NICKNAME_ERROR, PASSWORD_ERROR } from "@/lib/validator/user";
 import { prisma } from "@/lib/db";
-import { User } from "@prisma/client";
 import { hashPassword, publicUserSelect } from "@/lib/users";
+import { badRequest, errorResponse } from "@/lib/api-error";
 
 export async function GET() {
   try {
@@ -10,7 +10,7 @@ export async function GET() {
     return NextResponse.json(users, { status: 200 });
   }
   catch (error) {
-    return NextResponse.json({ error: `Failed to fetch users: ${error.message}` }, { status: 500 });
+    return errorResponse(error, "GET /api/users");
   }
 }
 
@@ -18,29 +18,29 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    if (!body.nickname) throw new Error("Require nickname");
-    if (!body.email) throw new Error("Require email");
-    if (!body.password) throw new Error("Require password");
+    if (!body.nickname) throw badRequest("Require nickname");
+    if (!body.email) throw badRequest("Require email");
+    if (!body.password) throw badRequest("Require password");
 
-    if (!isValidNickname(body.nickname)) throw new Error("Nickname must include: A-Z,a-z,0-9 and must be up to 20 symbols");
-    if (!isValidEmail(body.email)) throw new Error("Invalid email");
-    if (!isValidPassword(body.password)) throw new Error("The password must include: A-Z,a-z,0-9 and must have a length 8-20 symbols");
+    if (!isValidNickname(body.nickname)) throw badRequest(NICKNAME_ERROR);
+    if (!isValidEmail(body.email)) throw badRequest("Invalid email");
+    if (!isValidPassword(body.password)) throw badRequest(PASSWORD_ERROR);
 
-    const user: User = { ...body, password: await hashPassword(body.password) };
-
-    const newUser = await prisma.user.create({ data: user, select: publicUserSelect });
-
+    // Лише дозволені поля: id та інші службові поля клієнт не задає.
+    const newUser = await prisma.user.create({
+      data: {
+        nickname: body.nickname,
+        email: body.email,
+        firstName: typeof body.firstName === "string" ? body.firstName : undefined,
+        password: await hashPassword(body.password),
+      },
+      select: publicUserSelect,
+    });
 
     return NextResponse.json(newUser, { status: 200 });
-
   }
   catch (error) {
-
-    if (error.code === "P2002") {
-      return NextResponse.json({ error: "This email has already been registered" }, { status: 409 });
-    }
-    return NextResponse.json({ error: "Failed to add user" }, { status: 500 });
+    // P2002 (email уже зареєстровано) errorResponse перетворює на 409.
+    return errorResponse(error, "POST /api/users");
   }
-
 }
-
