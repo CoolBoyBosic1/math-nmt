@@ -1,7 +1,8 @@
-import { Plan } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server"
 import { isValidEndDate, isValidHours, END_DATE_ERROR, HOURS_ERROR } from "@/lib/validator/plan"
+import { badRequest, errorResponse } from "@/lib/api-error";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
     try {
@@ -9,27 +10,27 @@ export async function GET() {
         return NextResponse.json(plans, { status: 200 });
     }
     catch (error) {
-        return NextResponse.json({ error: `Prisma error: ${error.message}` }, { status: 503 });
+        return errorResponse(error, "GET /api/plans");
     }
 };
 
 export async function POST(request: Request) {
     try {
+        // План завжди створюється для користувача з сесії, а не з тіла запиту.
+        const userID = await requireUserId();
         const body = await request.json();
 
-        if (!body.userID) throw new Error("Require userID");
+        if (!isValidEndDate(body.endDate)) throw badRequest(END_DATE_ERROR);
+        if (!isValidHours(body.hours)) throw badRequest(HOURS_ERROR);
 
-        if (!isValidEndDate(body.endDate)) throw new Error(END_DATE_ERROR);
-        if (!isValidHours(body.hours)) throw new Error(HOURS_ERROR);
-
-        const plan: Plan = body;
-
-        const newPlan = await prisma.plan.create({ data: plan });
+        // Лише дозволені поля: id, startDate та інші службові поля клієнт не задає.
+        const newPlan = await prisma.plan.create({
+            data: { userID, hours: body.hours, endDate: body.endDate },
+        });
 
         return NextResponse.json(newPlan, { status: 200 });
     }
     catch (error) {
-        return NextResponse.json({ error: `Plan error: ${error.message}` }, { status: 503 });
+        return errorResponse(error, "POST /api/plans");
     }
-
 }

@@ -1,6 +1,8 @@
 // app/api/progress/[userID]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { errorResponse } from "@/lib/api-error";
+import { requireSelf } from "@/lib/session";
 
 export async function GET(
   request: Request,
@@ -9,6 +11,7 @@ export async function GET(
   try {
     const { params } = await context;
     const { userID } = await params;
+    await requireSelf(userID); // лише власний прогрес
 
     // Отримуємо всі записи UserTask для даного користувача
     // Припустимо, що якщо passed_on не null – завдання виконано правильно,
@@ -38,8 +41,7 @@ export async function GET(
     });
 
     return NextResponse.json({ progress });
-  } catch (error: any) {
-    console.error("Error fetching progress:", error);
-    return NextResponse.json({ error: "Сталася помилка при отриманні прогресу" }, { status: 500 });
+  } catch (error) {
+    return errorResponse(error, "GET /api/progress/[userID]");
   }
 }

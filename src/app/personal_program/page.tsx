@@ -4,11 +4,13 @@ import { useState } from "react";
 import "../styles/styles.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { DEMO_USER_ID } from "@/lib/demo";
+import { useSession } from "next-auth/react";
 import { MIN_HOURS, MAX_HOURS, MIN_DAYS } from "@/lib/validator/plan";
 
 export default function PersonalPlanPage() {
   const router = useRouter();
+  const { status } = useSession();
+  const loginUrl = "/register?callbackUrl=/personal_program";
   const [hoursNumber, setHoursNumber] = useState("");
   const [endDate, setEndDate] = useState("");
   const [error, setError] = useState<null | string>(null);
@@ -40,6 +42,12 @@ export default function PersonalPlanPage() {
     earliest.setDate(earliest.getDate() + MIN_DAYS);
     if (new Date(endDate) < earliest) return setError(`Дата має бути щонайменше через ${MIN_DAYS} днів`);
 
+    // План прив'язується до акаунта, тож спершу потрібен вхід.
+    if (status !== "authenticated") {
+      router.push(loginUrl);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -50,10 +58,13 @@ export default function PersonalPlanPage() {
         body: JSON.stringify({
           hours: Number(hoursNumber),
           endDate: new Date(endDate).toISOString(),
-          userID: DEMO_USER_ID // TODO (Sprint 5): брати ID із сесії
         })
       });
 
+      if (response.status === 401) {
+        router.push(loginUrl);
+        return;
+      }
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Помилка при створенні плану");

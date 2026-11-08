@@ -1,6 +1,6 @@
-The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
 
- RUN  v2.1.9 /home/claude/math-nmt
+ RUN  v2.1.9 /math-nmt
 
  ✓ tests/integration/api.test.ts > IT-01..03 POST /api/users — реєстрація > IT-01 коректні дані → 200 і запис у БД
  ✓ tests/integration/api.test.ts > IT-01..03 POST /api/users — реєстрація > IT-02 email уже зареєстровано (P2002) → 409
@@ -9,9 +9,31 @@ The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troub
  ✓ tests/integration/api.test.ts > IT-05..07 теми та задачі > IT-05 GET /api/topics → 200 і список тем
  ✓ tests/integration/api.test.ts > IT-05..07 теми та задачі > IT-06 GET /api/topics/[id] неіснуючої теми → 404
  ✓ tests/integration/api.test.ts > IT-05..07 теми та задачі > IT-07 POST /api/topics/[id]/tasks без відповіді → 400
- ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-08 POST /api/plans без userID → помилка
+ ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-08 POST /api/plans без входу → 401
  ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-09 прогрес плану: статуси red / yellow / green за темами
  ✓ tests/integration/api.test.ts > IT-08..10 план і прогрес > IT-10 прогрес користувача: розв’язані й помилки за темами
+ ✓ tests/integration/api.test.ts > IT-17..20 обробка помилок і дозволені поля плану > IT-17 POST /api/plans: userID із сесії, з body лише hours і endDate
+ ✓ tests/integration/api.test.ts > IT-17..20 обробка помилок і дозволені поля плану > IT-18 POST /api/plans з невалідними годинами → 400
+ ✓ tests/integration/api.test.ts > IT-17..20 обробка помилок і дозволені поля плану > IT-19 POST /api/plans з некоректним JSON → 400
+ ✓ tests/integration/api.test.ts > IT-17..20 обробка помилок і дозволені поля плану > IT-20 GET /api/plans/[id] неіснуючого плану (P2025) → 404
+ ✓ tests/integration/api.test.ts > IT-23..25 маршрути users: пароль і дозволені поля > IT-23 реєстрація з паролем зі спецсимволами (Aa123456!) → 200
+ ✓ tests/integration/api.test.ts > IT-23..25 маршрути users: пароль і дозволені поля > IT-24 реєстрація передає в БД лише nickname, email, firstName, хеш пароля
+ ✓ tests/integration/api.test.ts > IT-23..25 маршрути users: пароль і дозволені поля > IT-25 PATCH /api/users/[id] ігнорує поле id
+ ✓ tests/integration/api.test.ts > IT-27 доступ лише до власних даних > IT-27 прогрес іншого користувача → 403, без входу → 401
+ ✓ tests/integration/api.test.ts > IT-28..31 POST /api/attempts — збереження відповідей > IT-28 без входу → 401, у БД нічого не пишеться
+ ✓ tests/integration/api.test.ts > IT-28..31 POST /api/attempts — збереження відповідей > IT-29 без taskID чи відповіді → 400
+ ✓ tests/integration/api.test.ts > IT-28..31 POST /api/attempts — збереження відповідей > IT-30 правильна відповідь: сервер сам перевіряє і ставить passed_on
+ ✓ tests/integration/api.test.ts > IT-28..31 POST /api/attempts — збереження відповідей > IT-31 хибна відповідь після правильної не скасовує розв'язок
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-11 GET /api/topics повертає 29 тем МОН із seed
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-12 тема «Похідна функції» має теорію і 5 задач із картинками
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-13 НМТ-2024 містить 22 завдання з відповідями всіх трьох типів
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-14 реєстрація зберігає bcrypt-хеш, а не пароль
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-15 повторна реєстрація з тим самим email → 409
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-16 створення плану і порожній прогрес
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-21 GET /api/plans/[id] з некоректним UUID → 400, неіснуючий план → 404
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-22 POST /api/plans, коли користувача із сесії вже видалено → 409, а не 500
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-26 вхід: правильний пароль → користувач, хибний пароль чи невідомий email → null
+ ✓ tests/db/api-postgres.test.ts > IT-11..16, IT-21..22, IT-26, IT-32 API + PostgreSQL > IT-32 відповіді зберігаються в БД і потрапляють у прогрес: спершу помилка, потім розв'язок
  ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-14 ONE з літерою → singleLetter
  ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-15 ONE з числом → number
  ✓ tests/unit/test-mode-utils.test.ts > UT-14..17 getAnswerType > UT-16 MATCH → multipleLetters
@@ -31,12 +53,10 @@ The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troub
  ✓ tests/unit/test-mode-utils.test.ts > UT-27..30 час > UT-30 calculateCompletionTime рахує секунди від старту
  ✓ tests/unit/test-mode-utils.test.ts > UT-31..32 handleTestCompletion > UT-31 з таймером додає час до URL результатів
  ✓ tests/unit/test-mode-utils.test.ts > UT-31..32 handleTestCompletion > UT-32 без таймера — URL без параметра time
- ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-11 GET /api/topics повертає 29 тем МОН із seed
- ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-12 тема «Похідна функції» має теорію і 5 задач із картинками
- ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-13 НМТ-2024 містить 22 завдання з відповідями всіх трьох типів
- ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-14 реєстрація зберігає bcrypt-хеш, а не пароль
- ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-15 повторна реєстрація з тим самим email → 409
- ✓ tests/db/api-postgres.test.ts > IT-11..16 API + PostgreSQL > IT-16 створення плану і порожній прогрес
+ ✓ tests/unit/test-mode-utils.test.ts > UT-44..47 isCorrectAnswer — спільна перевірка для сторінки і сервера > UT-44 одна літера
+ ✓ tests/unit/test-mode-utils.test.ts > UT-44..47 isCorrectAnswer — спільна перевірка для сторінки і сервера > UT-45 число: кома і крапка рівнозначні
+ ✓ tests/unit/test-mode-utils.test.ts > UT-44..47 isCorrectAnswer — спільна перевірка для сторінки і сервера > UT-46 відповідність: об'єкт або JSON-рядок
+ ✓ tests/unit/test-mode-utils.test.ts > UT-44..47 isCorrectAnswer — спільна перевірка для сторінки і сервера > UT-47 відповідь невірного формату не кидає помилку, а вважається хибною
  ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-01 приймає латиницю та цифри
  ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-02 відхиляє кирилицю
  ✓ tests/unit/validators.test.ts > UT-01..04 isValidNickname > UT-03 відхиляє нік довший за 20 символів
@@ -46,16 +66,24 @@ The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troub
  ✓ tests/unit/validators.test.ts > UT-05..07 isValidEmail > UT-07 відхиляє email з пробілом
  ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-08 приймає пароль з 8 латинських символів і цифр
  ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-09 відхиляє пароль із 7 символів
- ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-10 відхиляє пароль із 21 символу
- ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-11 відхиляє пароль зі спецсимволом
+ ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-10 приймає 64 символи, відхиляє 65 і пароль довший за 72 байти
+ ✓ tests/unit/validators.test.ts > UT-08..11 isValidPassword > UT-11 приймає спецсимволи, відхиляє пробіли
  ✓ tests/unit/validators.test.ts > UT-12..13 валідатори плану (D1–D2 виправлено) > UT-12 дата НМТ раніше ніж через MIN_DAYS днів — невалідна, через 30 днів — валідна
  ✓ tests/unit/validators.test.ts > UT-12..13 валідатори плану (D1–D2 виправлено) > UT-13 години на тиждень: 10 — валідно, більше MAX_HOURS або 0 — ні
  ✓ tests/unit/validators.test.ts > UT-33..35 паролі > UT-33 hashPassword не зберігає пароль відкритим текстом
  ✓ tests/unit/validators.test.ts > UT-33..35 паролі > UT-34 verifyPassword приймає правильний і відхиляє хибний пароль
  ✓ tests/unit/validators.test.ts > UT-33..35 паролі > UT-35 withoutPassword прибирає пароль із відповіді
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-36 badRequest → 400 з власним повідомленням
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-37 ApiError зберігає заданий код
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-38 некоректний JSON (SyntaxError) → 400
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-39 Prisma P2025 (запис не знайдено) → 404, P2002 (дублікат) → 409
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-40 некоректний UUID від PostgreSQL (22P02) → 400
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-41 БД недоступна (ECONNREFUSED) → 503
+ ✓ tests/unit/api-error.test.ts > UT-36..42 classifyError — HTTP-код за типом помилки > UT-42 невідома помилка → 500 без деталей для клієнта
+ ✓ tests/unit/api-error.test.ts > UT-43 errorResponse > UT-43 повертає JSON { error } і пише в лог лише 5xx
 
- Test Files  4 passed (4)
-      Tests  51 passed (51)
-   Start at  15:39:47
-   Duration  2.41s (transform 188ms, setup 0ms, collect 396ms, tests 1.10s, environment 1ms, prepare 268ms)
+ Test Files  5 passed (5)
+      Tests  79 passed (79)
+   Start at  20:18:29
+   Duration  1.63s (transform 85ms, setup 0ms, collect 216ms, tests 984ms, environment 1ms, prepare 112ms)
 

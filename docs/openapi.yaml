@@ -1,13 +1,22 @@
 openapi: 3.0.3
 info:
   title: МатНМТ API
-  version: 0.1.0
+  version: 0.2.0
   description: |
     REST API платформи підготовки до НМТ з математики (Next.js Route Handlers + Prisma + PostgreSQL).
-    Документацію складено за кодом у src/app/api станом на 24.10.2026.
+    Документацію складено за кодом у src/app/api станом на 06.11.2026.
     Паролі зберігаються як bcrypt-хеш і ніколи не повертаються у відповідях.
-    Відомі обмеження поточної версії: немає автентифікації (усі маршрути відкриті, Sprint 4),
-    помилки валідації часто повертають 500/503 замість 400 (Sprint 4).
+
+    **Вхід.** Через Auth.js (`/api/auth/*`): `POST /api/auth/callback/credentials` з email і паролем
+    встановлює підписану cookie сесії (`authjs.session-token`). Маршрути з позначкою sessionCookie
+    працюють лише для користувача, що ввійшов, і лише з його власними даними.
+
+    **Помилки** мають вигляд `{ "error": "..." }`: 400 — некоректні дані, JSON або формат id;
+    401 — потрібен вхід; 403 — чужі дані; 404 — запис не знайдено; 409 — дублікат або порушено
+    зв’язок між записами; 500 — внутрішня помилка (деталі лише в лозі сервера); 503 — БД недоступна.
+
+    Відомі обмеження: маршрути керування контентом (теми, задачі) і плани за planID ще не мають
+    перевірки ролей і доступні без входу.
 servers:
   - url: http://localhost:3000
     description: Локальний запуск (npm run dev)
@@ -17,6 +26,8 @@ tags:
   - name: Tasks
   - name: Plans
   - name: Progress
+  - name: Attempts
+security: []
 
 paths:
   /api/users:
@@ -34,8 +45,9 @@ paths:
         content: { application/json: { schema: { $ref: "#/components/schemas/UserCreate" } } }
       responses:
         "200": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/Error" }
         "409": { description: Email уже зареєстровано, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
-        "500": { description: Помилка валідації або БД, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/users/{userID}:
     parameters: [{ $ref: "#/components/parameters/userID" }]
@@ -44,6 +56,8 @@ paths:
       summary: Користувач за ID
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         "500": { $ref: "#/components/responses/Error" }
     put:
       tags: [Users]
@@ -51,6 +65,8 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UserUpdate" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         "500": { $ref: "#/components/responses/Error" }
     patch:
       tags: [Users]
@@ -59,12 +75,17 @@ paths:
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UserUpdate" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         "500": { $ref: "#/components/responses/Error" }
     delete:
       tags: [Users]
       summary: Видалення користувача
       responses:
         "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/User" } } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
         "500": { $ref: "#/components/responses/Error" }
 
   /api/users/{userID}/plan:
@@ -72,6 +93,8 @@ paths:
     get:
       tags: [Users, Plans]
       summary: Користувач і його останній (активний) план
+      description: Лише для власного userID.
+      security: [{ sessionCookie: [] }]
       responses:
         "200":
           description: OK
@@ -83,7 +106,9 @@ paths:
                   user: { type: object, properties: { id: { type: string, format: uuid }, nickname: { type: string }, email: { type: string } } }
                   plan: { type: object, nullable: true, allOf: [{ $ref: "#/components/schemas/Plan" }] }
                   currentDate: { type: string, format: date-time }
-        "404": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
         "500": { $ref: "#/components/responses/Error" }
 
   /api/users/{userID}/topics/{topicID}/tasks:
@@ -101,6 +126,7 @@ paths:
       summary: Усі теми (дерево через parentID)
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Topic" } } } } }
+        "500": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
     post:
       tags: [Topics]
@@ -109,6 +135,8 @@ paths:
       responses:
         "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Topic" } } } }
         "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/topics/{topicID}:
     parameters: [{ $ref: "#/components/parameters/topicID" }]
@@ -190,15 +218,20 @@ paths:
       summary: Усі плани
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Plan" } } } } }
+        "500": { $ref: "#/components/responses/Error" }
         "503": { $ref: "#/components/responses/Error" }
     post:
       tags: [Plans]
       summary: Створити план навчання
-      description: "Правила: дата НМТ — щонайменше через 7 днів; годин на тиждень — від 1 до 80 (UT-12, UT-13)."
+      description: "План створюється для користувача з сесії (userID у тілі ігнорується). Правила: дата НМТ — щонайменше через 7 днів; годин на тиждень — від 1 до 80 (UT-12, UT-13)."
+      security: [{ sessionCookie: [] }]
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
       responses:
         "200": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/update:
     put:
@@ -227,27 +260,36 @@ paths:
       summary: План за ID
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     put:
       tags: [Plans]
       summary: Повне оновлення плану (hours, endDate обов’язкові)
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     patch:
       tags: [Plans]
       summary: Часткове оновлення плану
       requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/PlanInput" } } } }
       responses:
         "200": { description: OK, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     delete:
       tags: [Plans]
       summary: Видалити план
       responses:
         "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/Plan" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/{planID}/topics:
     parameters: [{ $ref: "#/components/parameters/planID" }]
@@ -265,7 +307,9 @@ paths:
       summary: Задачі теми, що входять до плану, зі статусом користувача
       responses:
         "200": { description: OK, content: { application/json: { schema: { type: array, items: { $ref: "#/components/schemas/Task" } } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
     post:
       tags: [Plans, Tasks]
       summary: Додати задачу до плану
@@ -274,7 +318,9 @@ paths:
         content: { application/json: { schema: { type: object, required: [taskID], properties: { taskID: { type: string, format: uuid } } } } }
       responses:
         "201": { description: Створено, content: { application/json: { schema: { $ref: "#/components/schemas/PlanTask" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "409": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/{planID}/topics/{topicID}/tasks/{taskID}:
     parameters: [{ $ref: "#/components/parameters/planID" }, { $ref: "#/components/parameters/topicID" }, { $ref: "#/components/parameters/taskID" }]
@@ -283,7 +329,9 @@ paths:
       summary: Прибрати задачу з плану
       responses:
         "200": { description: Видалений запис, content: { application/json: { schema: { $ref: "#/components/schemas/PlanTask" } } } }
-        "503": { $ref: "#/components/responses/Error" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
 
   /api/plans/{planID}/progress:
     parameters: [{ $ref: "#/components/parameters/planID" }]
@@ -308,6 +356,8 @@ paths:
     get:
       tags: [Progress]
       summary: Розв’язані задачі та помилки користувача за темами
+      description: "Ключ — id теми. Лише для власного userID. Дані наповнює POST /api/attempts."
+      security: [{ sessionCookie: [] }]
       responses:
         "200":
           description: OK
@@ -319,9 +369,55 @@ paths:
                   progress:
                     type: object
                     additionalProperties: { type: object, properties: { solved: { type: integer }, errors: { type: integer } } }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "403": { $ref: "#/components/responses/Error" }
+        "500": { $ref: "#/components/responses/Error" }
+
+  /api/attempts:
+    post:
+      tags: [Attempts]
+      summary: Зберегти відповідь на задачу
+      description: |
+        Правильність перевіряє сервер. Один запис на пару користувач–задача:
+        `passed_on` — дата першого правильного розв’язку, `null` — поки лише помилки.
+        Хибна відповідь після правильної розв’язок не скасовує.
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [taskID, answer]
+              properties:
+                taskID: { type: string, format: uuid }
+                answer:
+                  description: "Літера (ONE), число рядком (TYPE) або об’єкт відповідностей {\"1\":\"А\"} (MATCH)"
+                  oneOf: [{ type: string }, { type: object, additionalProperties: { type: string } }]
+      responses:
+        "200":
+          description: Спробу збережено
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  correct: { type: boolean, description: Чи правильна саме ця відповідь }
+                  solved: { type: boolean, description: Чи задачу вже розв’язано (будь-коли) }
+                  passed_on: { type: string, format: date-time, nullable: true }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
         "500": { $ref: "#/components/responses/Error" }
 
 components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: authjs.session-token
+      description: Cookie сесії Auth.js, яку встановлює вхід через /api/auth/callback/credentials.
   parameters:
     userID: { name: userID, in: path, required: true, schema: { type: string, format: uuid } }
     topicID: { name: topicID, in: path, required: true, schema: { type: string, format: uuid } }
@@ -329,7 +425,7 @@ components:
     planID: { name: planID, in: path, required: true, schema: { type: string, format: uuid } }
   responses:
     Error:
-      description: Помилка
+      description: "Помилка. 400 — некоректні дані або формат id; 404 — запис не знайдено; 409 — дублікат або порушено зв’язок між записами; 500 — внутрішня помилка; 503 — БД недоступна."
       content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
   schemas:
     Error:
@@ -349,7 +445,7 @@ components:
         firstName: { type: string }
         nickname: { type: string, maxLength: 20, pattern: "^[A-Za-z0-9]+$" }
         email: { type: string, format: email }
-        password: { type: string, minLength: 8, maxLength: 20, pattern: "^[A-Za-z0-9]+$" }
+        password: { type: string, minLength: 8, maxLength: 64, pattern: "^\\S+$", description: "Будь-які символи без пробілів, зокрема ! @ #; не більше 72 байтів (обмеження bcrypt)" }
     UserUpdate:
       allOf: [{ $ref: "#/components/schemas/UserCreate" }]
     Topic:
@@ -407,10 +503,8 @@ components:
         topicId: { type: string, format: uuid, nullable: true }
     PlanInput:
       type: object
-      required: [userID]
       properties:
-        userID: { type: string, format: uuid }
-        hours: { type: integer }
+        hours: { type: integer, minimum: 1, maximum: 80 }
         endDate: { type: string, format: date-time }
     PlanTask:
       type: object

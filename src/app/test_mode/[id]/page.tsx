@@ -4,7 +4,9 @@ import Confetti from "react-confetti";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+import { useSession } from "next-auth/react";
 import useUnsavedChangesWarning from "../routerWarning";
+import { saveAttempt } from "../saveAttempt";
 import { Task, MultipleLettersAnswer } from "../types";
 import { getAnswerType,  checkSingleLetterAnswer,  checkMultipleLettersAnswer, 
   checkNumberAnswer, checkIfTimerNeeded,  formatTime,  handleTestCompletion 
@@ -19,6 +21,7 @@ export default function TestModePage() {
   const params = useParams();
   const topicId = params?.id as string;
   const router = useRouter();
+  const { status: sessionStatus } = useSession();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
@@ -213,6 +216,8 @@ export default function TestModePage() {
         setShowConfetti(true);
         setResults(prev => ({...prev, correct: prev.correct + 1}));
       }
+      // Для учня, що ввійшов, зберігаємо спробу: з неї рахується прогрес і помилки.
+      if (sessionStatus === "authenticated") saveAttempt(currentTask.id, answer);
     } else {
       handleNextTask();
     }

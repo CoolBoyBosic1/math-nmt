@@ -8,7 +8,7 @@ Next.js 15 · Prisma 6 (Rust-free клієнт + драйвер `pg`) · Postgre
 
 ```bash
 npm install                      # також генерує Prisma Client
-cp .env.example .env             # вкажіть свій DATABASE_URL
+cp .env.example .env             # вкажіть свій DATABASE_URL і AUTH_SECRET (openssl rand -base64 32)
 npx prisma migrate deploy        # створює 7 таблиць
 npx prisma db seed               # 29 тем із теорією, 236 задач, демо-користувач
 npm run dev                      # http://localhost:3000
@@ -16,7 +16,15 @@ npm run dev                      # http://localhost:3000
 
 Seed додає задачі з `public/tasks` з правильними відповідями (`prisma/data/answers.json`,
 зчитані з картинок розв’язків скриптом `prisma/data/detect_answers.py`) і демо-користувача
-`demo@matnmt.local` / `demo12345`, від імені якого працюють сторінки плану до появи входу в акаунт.
+`demo@matnmt.local` / `demo12345` з готовим планом — ним зручно входити на демо.
+
+## Вхід і дані користувача
+
+Вхід за email і паролем через Auth.js (`src/auth.ts`, маршрути `/api/auth/*`); сесія — підписаний JWT
+у cookie, ключ підпису — `AUTH_SECRET`. Після входу план, прогрес і відповіді тестів належать цьому
+користувачу: `POST /api/plans` і `POST /api/attempts` беруть його з сесії, а
+`/api/users/{id}/plan` і `/api/progress/{id}` віддають лише власні дані (інакше 401/403).
+Пароль: 8–64 будь-які символи без пробілів, спецсимволи дозволені.
 
 ## Тести
 
